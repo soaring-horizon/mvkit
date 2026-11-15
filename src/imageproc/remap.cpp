@@ -948,19 +948,35 @@ Image polar_trans_image_halcon(const Image &image, double row, double col,
                       -1, "byte, int2, uint2 or real image required");
   check(start_radius >= 0 && end_radius >= 0 && start_radius != end_radius, op,
         "Radius", "nonnegative, distinct radii required");
+  advanced::image(image,op);
+  dimensions(width,height,op);
+  advanced::interpolation(mode,op);
+  const auto radius_at=[&](std::size_t r) {
+    return start_radius+(end_radius-start_radius)*(height==1?0.:double(r)/(height-1));
+  };
+  // Keep the workspace bounded to 1 MiB and avoid a table for a single row.
+  if(height==1 || width>65536)
+    return remap(image.full_domain(),width,height,mode,[&](auto r,auto c) {
+      const auto angle=start_angle+(end_angle-start_angle)*(width==1?0.:double(c)/(width-1));
+      const auto radius=radius_at(r);
+      return std::array<double,2>{col+radius*std::cos(angle),row-radius*std::sin(angle)};
+    },true).full_domain();
+  ExecutionContext context;
+  std::pmr::vector<std::array<double,2>> directions{context.scratch_resource()};
+  directions.resize(width);
+  // Each output column has the same angle on every row/channel. Preserve the
+  // Double expressions, but evaluate their trigonometric functions only once.
+  for(std::size_t c=0;c<width;++c) {
+    const auto angle=start_angle+(end_angle-start_angle)*
+        (width==1?0.:double(c)/(width-1));
+    directions[c]={std::cos(angle),std::sin(angle)};
+  }
   return remap(
              image.full_domain(), width, height, mode,
              [&](auto r, auto c) {
-               const auto angle =
-                   start_angle +
-                   (end_angle - start_angle) *
-                       (width == 1 ? 0. : double(c) / (width - 1));
-               const auto radius =
-                   start_radius +
-                   (end_radius - start_radius) *
-                       (height == 1 ? 0. : double(r) / (height - 1));
-               return std::array<double, 2>{col + radius * std::cos(angle),
-                                            row - radius * std::sin(angle)};
+               const auto radius=radius_at(r);
+               return std::array<double, 2>{col+radius*directions[c][0],
+                                            row-radius*directions[c][1]};
              },
              true)
       .full_domain();

@@ -258,6 +258,31 @@ mv::core::XldContours smooth_contours_xld(const mv::core::XldContours& contours,
     const auto& c=contours.contour(index); const auto p=c.points();
     std::pmr::vector<Point2d> q(p.size(),mv::runtime::persist_resource());
     auto* destination=q.data();
+    const bool closed=p.size()>1 && p.front()==p.back();
+    if(closed) {
+      // Explicit closing coordinates describe a cycle, not two open endpoints.
+      // Use each unique vertex once at most; rotate the neighborhood across the seam.
+      const auto count=p.size()-1;
+      const auto window=std::min<std::size_t>(n,(count&1)?count:count-1);
+      const auto radius=window/2;
+      ExecutionContext context;
+      std::pmr::vector<Point2d> extended{context.scratch_resource()};
+      extended.reserve(count+2*radius);
+      for(std::size_t j=0;j<count+2*radius;++j)
+        extended.push_back(p[(j+count-radius)%count]);
+      const std::span<const Point2d> cycle{extended};
+      std::size_t i=0;
+#if MVKIT_RDP_SSE2
+      if(simd)for(;i+1<count;i+=2) {
+        if(window==3)smooth_projection_pair<3>(cycle,i+radius,destination+i);
+        else if(window==5)smooth_projection_pair<5>(cycle,i+radius,destination+i);
+        else if(window==7)smooth_projection_pair<7>(cycle,i+radius,destination+i);
+        else break;
+      }
+#endif
+      for(;i<count;++i)destination[i]=smooth_projection(p[i],cycle.subspan(i,window));
+      destination[count]=destination[0];
+    } else {
     const auto fixed_window = [&](auto size) {
       constexpr std::size_t window = decltype(size)::value, radius = window/2;
       std::size_t i=0;
@@ -283,6 +308,7 @@ mv::core::XldContours smooth_contours_xld(const mv::core::XldContours& contours,
     else for (std::size_t i=0;i<p.size();++i) {
       const std::size_t a=i>half?i-half:0,b=std::min(p.size(),i+half+1);
       destination[i]=smooth_projection(p[i],p.subspan(a,b-a));
+    }
     }
     out.push_back(mv::core::IconicValue::from_xld_contour(XldContour::from_owned_points_and_attributes(std::move(q),c.closed(),c.approximation(),
         c.point_attribute(mv::core::XldPointAttribute::Response),

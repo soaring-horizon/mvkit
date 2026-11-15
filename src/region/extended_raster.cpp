@@ -213,7 +213,7 @@ Region thin_dense(const Region& region, const RectI64& box, std::size_t width, s
   const auto w = width + 2, h = height + 2;
   ExecutionContext context;
   auto* memory = context.scratch_resource();
-  std::pmr::vector<unsigned char> pixels(w * h, 0, memory), remove(w * h, 0, memory);
+  std::pmr::vector<unsigned char> pixels(w * h, 0, memory), listed(w * h, 0, memory);
   for (const auto& run : region.runs()) {
     const auto y =
         static_cast<std::size_t>(std::uint64_t(run.row) - std::uint64_t(box.row_min)) + 1;
@@ -234,33 +234,50 @@ Region thin_dense(const Region& region, const RectI64& box, std::size_t width, s
     p[6] = pixels[i - 1];
     p[7] = pixels[i - w - 1];
   };
+  std::pmr::vector<std::size_t> frontier{memory}, remove{memory};
+  frontier.reserve(std::min<std::size_t>(region.area(),2*(w+h)));
+  // Interior pixels have eight foreground neighbors and cannot pass either
+  // deletion predicate. They enter the frontier only after a neighbor is erased.
+  for(std::size_t y=1;y+1<h;++y)for(std::size_t x=1;x+1<w;++x) {
+    const auto i=y*w+x;
+    if(!pixels[i])continue;
+    int p[8];neighbors(i,p);
+    if(std::any_of(std::begin(p),std::end(p),[](int value){return value==0;})) {
+      frontier.push_back(i);listed[i]=1;
+    }
+  }
   bool changed;
   do {
     changed = false;
     for (int pass = 0; pass < 2; ++pass) {
-      std::fill(remove.begin(), remove.end(), static_cast<unsigned char>(0));
-      for (std::size_t y = 1; y + 1 < h; ++y)
-        for (std::size_t x = 1; x + 1 < w; ++x) {
-          const auto i = y * w + x;
-          if (!pixels[i]) continue;
-          int p[8];
-          neighbors(i, p);
-          int n = 0, transitions = 0;
-          zhang_counts(p, &n, &transitions);
-          if (n < 2 || n > 6 || transitions != 1) continue;
-          if (!zhang_keep(p, pass)) remove[i] = 1;
-        }
-      for (std::size_t i = 0; i < pixels.size(); ++i)
-        if (remove[i]) {
-          int p[8];
-          neighbors(i, p);
-          int n = 0, transitions = 0;
-          zhang_counts(p, &n, &transitions);
-          if (n >= 2 && transitions == 1) {
-            pixels[i] = 0;
-            changed = true;
+      remove.clear();
+      for (const auto i : frontier) {
+        int p[8];
+        neighbors(i, p);
+        int n = 0, transitions = 0;
+        zhang_counts(p, &n, &transitions);
+        if (n < 2 || n > 6 || transitions != 1) continue;
+        if (!zhang_keep(p, pass)) remove.push_back(i);
+      }
+      for (const auto i : remove) {
+        int p[8];
+        neighbors(i, p);
+        int n = 0, transitions = 0;
+        zhang_counts(p, &n, &transitions);
+        if (n >= 2 && transitions == 1) {
+          pixels[i] = 0;
+          changed = true;
+          const std::size_t adjacent[]{i-w,i-w+1,i+1,i+w+1,i+w,i+w-1,i-1,i-w-1};
+          for(const auto j:adjacent)if(pixels[j] && !listed[j]) {
+            listed[j]=1;frontier.push_back(j);
           }
         }
+      }
+      frontier.erase(std::remove_if(frontier.begin(),frontier.end(),
+          [&](auto i){return !pixels[i];}),frontier.end());
+      // The topology recheck above is order-dependent. Retain the original
+      // full-grid row/column deletion order on every half-iteration.
+      std::sort(frontier.begin(),frontier.end());
     }
   } while (changed);
   std::pmr::vector<RegionRun> runs{memory};

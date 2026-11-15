@@ -274,28 +274,40 @@ core::Tuple get_calib_data(const CalibrationDataModel& data, std::string_view it
                               "camera parameters are not configured");
       return camera_parameters_to_tuple(*camera.parameters);
     }
+    if (data_name == "pose") {
+      if (!data.calibration_result())
+        throw core::Exception(core::Status::InvalidState,"get_calib_data","camera calibration result is not available");
+      const auto& poses=data.calibration_result()->camera_poses;
+      return pose_to_halcon_tuple(poses.empty() ? Pose3d{} : poses.at(static_cast<std::size_t>(index)));
+    }
     if (data_name == "excluded_settings" || data_name == "calib_settings")
       return camera_settings(camera, data_name == "excluded_settings");
     if (data_name == "stddev" || data_name == "params_deviations") {
       if (!data.calibration_result())
         throw core::Exception(core::Status::InvalidState, "get_calib_data",
                               "camera calibration result is not available");
-      if (!data.calibration_result()->covariance_available)
+      const auto& result=*data.calibration_result();
+      const bool available=result.device_covariance_available.empty()?result.covariance_available:result.device_covariance_available.at(index);
+      if (!available)
         throw core::Exception(core::Status::InvalidState, "get_calib_data",
                               "camera uncertainty is unavailable");
-      core::Tuple result;
-      for (double v : data.calibration_result()->camera_stddev) result.append(v);
-      return result;
+      const auto& values=data.calibration_result()->device_stddev;
+      core::Tuple out;
+      for (double v : values.empty()?data.calibration_result()->camera_stddev:values.at(index)) out.append(v);
+      return out;
     }
     if (data_name == "covariance" || data_name == "params_covariances") {
       if (!data.calibration_result())
         throw core::Exception(core::Status::InvalidState, "get_calib_data",
                               "camera calibration result is not available");
-      if (!data.calibration_result()->covariance_available)
+      const auto& solved=*data.calibration_result();
+      const bool available=solved.device_covariance_available.empty()?solved.covariance_available:solved.device_covariance_available.at(index);
+      if (!available)
         throw core::Exception(core::Status::InvalidState, "get_calib_data",
                               "camera covariance is unavailable");
       core::Tuple result;
-      for (double v : data.calibration_result()->camera_covariance) result.append(v);
+      const auto& values=data.calibration_result()->device_covariance;
+      for (double v : values.empty()?data.calibration_result()->camera_covariance:values.at(index)) result.append(v);
       return result;
     }
     if (data.hand_eye_result()) {
@@ -428,6 +440,11 @@ core::Tuple get_calib_data(const CalibrationDataModel& data, std::string_view it
       }
     }
     if (data_name == "num_cameras") return core::Tuple{static_cast<std::int64_t>(data.num_cameras())};
+    if (data_name == "reference_camera") return core::Tuple{std::int64_t{0}};
+    if (data_name == "camera_calib_error") {
+      if(!data.calibration_result())throw core::Exception(core::Status::InvalidState,"get_calib_data","camera calibration result is not available");
+      return core::Tuple{data.calibration_result()->rmse};
+    }
     if (data_name == "num_calib_objs")
       return core::Tuple{static_cast<std::int64_t>(data.num_calibration_objects())};
     if (data_name == "max_iterations")

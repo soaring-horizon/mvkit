@@ -1,0 +1,36 @@
+{
+    "format": "mvkit-stereo-calibration",
+    "leftCamera": [
+        "area_scan_division",
+        0.01,
+        0,
+        0.0001,
+        0.0001,
+        63.5,
+        39.5,
+        128,
+        80
+    ],
+    "lengthUnit": "m",
+    "rightCamera": [
+        "area_scan_division",
+        0.01,
+        0,
+        0.0001,
+        0.0001,
+        63.5,
+        39.5,
+        128,
+        80
+    ],
+    "rightInLeft": [
+        0.08,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "version": 1
+}

@@ -6,6 +6,7 @@
 #include <core/image.hpp>
 #include <core/region.hpp>
 #include <core/regions.hpp>
+#include <core/runtime_context.hpp>
 
 namespace mv::xld {
 
@@ -49,7 +50,8 @@ struct ContourAreaMeasurement { double area=0, row=0, col=0; bool positive=true;
 [[nodiscard]] ContourAreaMeasurement measure_contour_area(const mv::core::XldContour& contour, bool centers);
 struct AreaCenterXldResult { mv::core::Tuple area, row, column, point_order; };
 [[nodiscard]] AreaCenterXldResult area_center_xld(const mv::core::XldContours& contours, bool centers = true);
-[[nodiscard]] mv::core::Regions gen_region_contour_xld(const mv::core::XldContours& contours, ContourRegionMode mode);
+[[nodiscard]] mv::core::Regions gen_region_contour_xld(const mv::core::XldContours& contours, ContourRegionMode mode,
+    mv::core::Neighborhood neighborhood=mv::core::Neighborhood::Eight);
 enum class XldAttributeMode { Keep, Forget };
 [[nodiscard]] mv::core::XldContours union_adjacent_contours_xld(const mv::core::XldContours&, double max_dist_abs, double max_dist_rel, XldAttributeMode);
 [[nodiscard]] mv::core::XldContours union_collinear_contours_xld(const mv::core::XldContours&, double max_dist_abs, double max_dist_rel, double max_shift, double max_angle, XldAttributeMode);

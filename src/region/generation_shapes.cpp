@@ -68,7 +68,9 @@ mv::core::Region gen_region_polygon_filled(const mv::core::Tuple& rows,
         auto x=x0,y=y0;const auto dx=std::abs(x1-x0),dy=-std::abs(y1-y0),sx=x0<x1?std::int64_t{1}:std::int64_t{-1};auto error=dx+dy;
         for(;;) {
           boundary.push_back({y,x,x});if(x==x1&&y==y1)break;const auto twice=2*error;
-          const bool xtie=2*x+sx>0?sx>0:sx<0,ytie=2*y+1>0;
+          // Midpoint choices depend on edge direction, not the absolute
+          // coordinate sign, so integer translations preserve the raster.
+          const bool xtie=sx>0,ytie=true;
           if(twice>dy||(twice==dy&&(variant?!xtie:xtie))){error+=dy;x+=sx;}
           if(twice<dx||(twice==dx&&(variant?!ytie:ytie))){error+=dx;++y;}
         }

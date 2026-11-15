@@ -64,7 +64,7 @@ extern "C" ::MvStatus mv_gen_contour_region_xld(::MvObject Regions,::MvObject* C
  return mv::c_api::translate([&]{constexpr auto op="gen_contour_region_xld";mv::c_api::require_output(Contours,op);mv::c_api::require_iconic(Regions,op,"Regions");Regions->value.require_kind(mv::core::IconicKind::Region,op);const TupleInput mode(Mode,op,"Mode");const auto value=text(mode);mv::xld::RegionContourMode kind;if(value=="center")kind=mv::xld::RegionContourMode::Center;else if(value=="border")kind=mv::xld::RegionContourMode::Border;else if(value=="border_holes")kind=mv::xld::RegionContourMode::BorderHoles;else mode.fail(ErrorCode::UnsupportedValue,0,"unsupported contour mode");*Contours=mv::c_api::make_xld_contours(algorithm(op,[&]{return mv::xld::gen_contour_region_xld(mv::core::Regions{Regions->value},kind);}));});
 }
 extern "C" ::MvStatus mv_gen_region_contour_xld(::MvObject Contour,::MvObject* Region,::MvTuple Mode) {
- return mv::c_api::translate([&]{constexpr auto op="gen_region_contour_xld";mv::c_api::require_output(Region,op);const auto c=contours(Contour,op,"Contour");const TupleInput mode(Mode,op,"Mode");const auto value=text(mode);mv::xld::ContourRegionMode kind;if(value=="filled")kind=mv::xld::ContourRegionMode::Filled;else if(value=="margin")kind=mv::xld::ContourRegionMode::Margin;else mode.fail(ErrorCode::UnsupportedValue,0,"filled or margin required");*Region=mv::c_api::make_regions(algorithm(op,[&]{return mv::xld::gen_region_contour_xld(c,kind);}));});
+ return mv::c_api::translate([&]{constexpr auto op="gen_region_contour_xld";mv::c_api::require_output(Region,op);const auto c=contours(Contour,op,"Contour");const TupleInput mode(Mode,op,"Mode");const auto value=text(mode);mv::xld::ContourRegionMode kind;if(value=="filled")kind=mv::xld::ContourRegionMode::Filled;else if(value=="margin")kind=mv::xld::ContourRegionMode::Margin;else mode.fail(ErrorCode::UnsupportedValue,0,"filled or margin required");const auto neighborhood=mv::core::current_runtime_context().neighborhood;*Region=mv::c_api::make_regions(algorithm(op,[&]{return mv::xld::gen_region_contour_xld(c,kind,neighborhood);}));});
 }
 extern "C" ::MvStatus mv_length_xld(::MvObject XLD,::MvTuple* Length) {
  return mv::c_api::translate([&]{constexpr auto op="length_xld";mv::c_api::ControlOutputs<1> output(op,{Length});const auto value=contours(XLD,op,"XLD");output[0]=Tuple(mv::xld::length_xld(value));output.Commit();});
@@ -195,7 +195,17 @@ XldContour ordered_image_contour(const XldContour& contour) {
  return XldContour::from_points_and_attributes(points,false,contour.approximation(),response,edge,normal);
 }
 template<class F> XldContours image_contours(const mv::core::IconicTuple& images,F&& f) {
- XldContours result;for(std::size_t i=0;i<images.size();++i){const auto value=f(images.at(i).as_image());for(std::size_t k=0;k<value.contour_count();++k)result.append(ordered_image_contour(value.contour(k)));}return result;
+ // XldContours::append concatenates immutable tuples, copying the entire
+ // accumulated object list each time. Publish once after collecting contours
+ // so image texture and newly retained weak arms do not cause quadratic work.
+ std::vector<mv::core::IconicValue> result;
+ for(std::size_t i=0;i<images.size();++i) {
+  const auto value=f(images.at(i).as_image());
+  if(result.empty())result.reserve(value.contour_count());
+  for(std::size_t k=0;k<value.contour_count();++k)
+   result.push_back(mv::core::IconicValue::from_xld_contour(ordered_image_contour(value.contour(k))));
+ }
+ return XldContours{mv::core::IconicTuple{std::move(result)}};
 }
 }
 extern "C" ::MvStatus mv_threshold_sub_pix(::MvObject Image,::MvObject* Border,::MvTuple Threshold) {

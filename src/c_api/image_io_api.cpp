@@ -17,6 +17,7 @@
 #include <imageio/builtins.hpp>
 #include <imageio/codec.hpp>
 #include <imageio/stream.hpp>
+#include <imageio/codecs/tiff_codec.hpp>
 
 namespace {
 void require_path(const char* path, const char* where) {
@@ -55,7 +56,16 @@ extern "C" ::MvStatus mv_read_image(::MvObject* image, ::MvTuple filenames) {
       if (!stream.good())
         throw mv::core::Exception(mv::core::Status::IoError,mv::core::ErrorCode::IoFailure,
             "read_image","FileName",i,"failed to open input image file");
-      values.push_back(mv::imageio::default_image_io_service().read(stream));
+      std::byte header[4];
+      const auto count = stream.read(header, sizeof(header));
+      stream.seek(0);
+      mv::imageio::TiffCodec tiff;
+      if (tiff.can_decode(std::span<const std::byte>(header, count))) {
+        auto pages = tiff.decode_all(stream, {});
+        for (auto& page : pages) values.push_back(std::move(page));
+      } else {
+        values.push_back(mv::imageio::default_image_io_service().read(stream));
+      }
     }
     auto created = mv::c_api::make_iconic(mv::core::make_image_tuple(std::move(values)));
     *image = created.release();

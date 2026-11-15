@@ -1,0 +1,6 @@
+<!-- Copyright 2026 MVKit contributors; SPDX-License-Identifier: Apache-2.0 -->
+<RCC>
+  <qresource prefix="/studio">
+    <file>choice-arrow.png</file>
+  </qresource>
+</RCC>

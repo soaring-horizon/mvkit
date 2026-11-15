@@ -4,30 +4,42 @@
 
 ## 项目简介
 
-**mvkit** 是一款面向工业机器视觉的 C/C++ 基础算法库，涵盖图像处理、特征提取、匹配定位、相机标定、双目视觉及三维处理等核心功能。项目参考 **HALCON 的算子语义与数据对象组织方式** 实现独立开发，主要通过正向开发对齐HALCON算子的功能和性能，目前已实现 **277** 个与 HALCON 对应的常用视觉算子。
+**MVKit** 是面向工业机器视觉的 C/C++ SDK，提供图像处理、区域与轮廓分析、匹配定位、标定及三维重建。项目以 HALCON 公开接口为参考，用于学习和验证机器视觉软件架构与算法，目前已实现 **277** 个对应的常用视觉算子。测量、读码、深度学习和 OCR 暂未纳入开发范围。
 
-- **当前处于开发阶段，不保证 API/ABI 兼容。** 如使用建议 fork 后维护，或固定 commit/tag 使用。
-- 本职工作主要负责测量算法，当前项目版本暂不开发或提供 **Measure/Metrology** 等测量相关接口。
-- 大部分测试场景精度与 HALCON 基本一致，耗时约为 HALCON 的 **1–2 倍**之间。
+**MV Studio** 是配套的桌面工作台，用于测试算子与搭建工作流，可在同一工程中管理输入数据、节点参数及二维和三维结果。
+
+发布版本 **0.2.0** · [发布说明](docs/version.md) · [Studio 使用与构建](apps/README.md)
+
+本项目处于**开发阶段，不保证 API/ABI 兼容**。集成时建议固定提交或标签，也可 fork 后维护。在已有对照测试中，多数用例的精度与 HALCON 接近，常见用例的耗时约为 HALCON 的 **1–2 倍**。
 
 推荐使用 **C++ 函数式和对象式接口**。函数式调用如 `mv::Threshold(image, &regions, ...)`，参数组织接近算子调用；对象式调用如 `image.Threshold(...)`，适合围绕图像、区域和模型组织业务。两种方式均由对象与元组自动管理资源，可按场景组合使用。C 接口主要供其他语言绑定及需要显式生命周期管理的应用使用。
 
-初始版本：**0.1.0** · [发布说明](docs/version.md)。
+## MV Studio 工程界面
 
-## 效果展示
+在 Windows x64 运行包中启动 `mv_studio.exe`，从“文件 → 示例工程”打开例程，按 F5 运行。随包提供 10 个二维检测、尺寸测量和三维重建工程。[Studio 示例目录](examples/studio/README.md)
+
+**模板定位与尺寸测量** · 以形状模板定位工件，跟随工件位姿提取边缘，拟合圆和直线后测量孔径与孔边距。右侧视图显示圆心到边缘的距离，底部数据栏显示各图像的 OK／NG 判定。
+
+![MV Studio 模板定位与尺寸测量工程，右侧显示圆心到工件边缘的距离](docs/assets/studio-template-positioning-measurement.png)
+
+**结构光三维重建** · 解码 25 帧有序投影图像，重建机加工件表面。右侧并排显示伪彩深度图和三维点云。
+
+![MV Studio 机加工件结构光重建工程，右侧并排显示深度图和点云](docs/assets/studio-structured-light-reconstruction.png)
+
+## SDK 效果展示
 
 展示的图像处理、轮廓和匹配定位结果均为 mvkit 实际处理结果。
 
-图像处理、Region、XLD、Shape/NCC 匹配分别提供 C++ 过程式和对象式两种演示，源码与运行命令见 [examples](examples/README.md)，原始输入图片见 [images](examples/images/)。
+图像处理、Region、XLD、匹配分别提供 C++ 过程式和对象式两种演示，源码与运行命令见 [examples](examples/README.md)，原始输入图片见 [images](examples/images/)。
 
 
 ![中值滤波效果](docs/assets/image-processing.png)
 
-<p align="center"><strong>滤波</strong> · 原图 → 添加脉冲噪声 → 中值滤波</p>
+<p align="center"><strong>图像处理</strong> · 原图 → 添加脉冲噪声 → 中值滤波</p>
 
 ![区域与形态学效果](docs/assets/region-morphology.png)
 
-<p align="center"><strong>区域与形态学</strong> · 阈值与开运算 → 连通域 → 填洞</p>
+<p align="center"><strong>区域与形态学</strong> · 阈值与开运算 → 连通域 → 填充孔洞</p>
 
 ![亚像素边缘](docs/assets/subpixel-edges.png)
 
@@ -35,11 +47,7 @@
 
 ![Shape 模板匹配](docs/assets/shape-matching.png)
 
-<p align="center"><strong>Shape 定位</strong> · 模板 → 搜索图像 → 匹配轮廓与位置</p>
-
-![NCC 模板匹配](docs/assets/ncc-matching.png)
-
-<p align="center"><strong>NCC 定位</strong> · 模板 → 搜索图像 → 匹配位置</p>
+<p align="center"><strong>模板定位</strong> · 轮廓匹配 → 搜索图像 → 匹配轮廓与位置</p>
 
 ## 架构介绍
 
@@ -82,7 +90,7 @@ runtime：内存资源、临时空间、CPU 特性检测、并行执行
 
 **CPU 特性派发**：运行时检测部署设备的 CPU 指令集和操作系统寄存器保存能力。默认自动模式下，已编译 AVX2 内核且 CPU/操作系统支持时，对具备对应实现且满足输入条件的计算自动选择 AVX2 分支；其余计算使用可用的 SSE2 或标量路径（无ARM开发环境，项目中暂无NEON指令代码）。后端配置和使用约束见 [runtime](docs/runtime.md)。
 
-## 安装及使用
+## SDK 安装及使用
 
 需要支持 C++20 的编译器来构建库；下游 C++ 应用可使用 C++14。CMake 3.20+；VS2026 需要支持该生成器的 CMake 4.2+。依赖优先复用系统开发库，缺失时从固定版本、固定 SHA-256 的上游归档构建。
 
@@ -90,8 +98,6 @@ Windows（VS2019/2022/2026，脚本自动优先选择较新版本）：
 
 ```powershell
 ./scripts/setup-windows.ps1
-New-Item -ItemType Directory -Path build/demo-output -Force
-./build/bin/Release/mvkit_demo_image_processing.exe ./examples/images ./build/demo-output
 ```
 
 Ubuntu / WSL：
@@ -100,8 +106,6 @@ Ubuntu / WSL：
 bash scripts/setup-ubuntu.sh --system
 cmake --preset linux
 cmake --build --preset linux --parallel
-mkdir -p build/demo-output
-./build/bin/mvkit_demo_image_processing ./examples/images ./build/demo-output
 ```
 
 安装 SDK：
@@ -139,6 +143,8 @@ int main() {
 
 配置下游时通过 `-DCMAKE_PREFIX_PATH=/absolute/path/to/out/mvkit` 指定安装前缀。Windows C++ 应用运行时需能找到 `mvkit.dll`、`mvkitcpp.dll` 及实际使用的编解码运行库。完整配置与离线构建见[构建说明](docs/build.md)。
 
+命令行图片演示可通过 `MVKIT_BUILD_EXAMPLES=ON` 启用。编译与运行步骤见[示例说明](examples/README.md)。
+
 ## 项目开发环境
 
 当前主要开发机：Intel Core i5-13600K（14 核/20 线程）、约 64 GiB 内存、Windows 11 x64、Visual Studio 2026 / MSVC 19.51。Linux 在 WSL2 的 Ubuntu 24.04.4 LTS 中构建，使用 GCC 13.3、CMake 3.28.3 和 Ninja 1.11.1。环境信息说明见[开发与验证环境](docs/platform.md)。
@@ -163,6 +169,7 @@ MVKit 自有代码采用 [Apache License 2.0](LICENSE)。该许可不替代第�
 | libpng | 1.6.58；PNG 编解码的源码回退 | PNG Reference Library License 及历史声明；[上游许可](https://github.com/pnggroup/libpng/blob/v1.6.58/LICENSE) |
 | LibTIFF | 4.7.2；TIFF 编解码的源码回退 | 上游宽松许可及逐文件声明；[上游许可](https://gitlab.com/libtiff/libtiff/-/blob/v4.7.2/LICENSE.md) |
 | zlib | 1.3.2；编解码传递依赖的源码回退 | zlib License；[上游许可](https://github.com/madler/zlib/blob/v1.3.2/LICENSE) |
+| Qt | 5.15.2；MV Studio 动态链接 Qt Core、Gui、Widgets，并加载 Windows 平台插件 | 版权所有 The Qt Company Ltd. 及各贡献者；[LGPL v3.0](apps/third-party/qtbase-5.15.2/LICENSE.LGPL3)；[版权通知与对应源码](apps/THIRD_PARTY.md#qt-5152) |
 
 使用 libjpeg-turbo 时保留以下通知：
 

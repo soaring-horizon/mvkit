@@ -1,0 +1,372 @@
+{
+  "project": "Microsoft Fluent UI System Icons",
+  "commit": "9eb184e96268d3293462f9d9d19225b4c7b07774",
+  "license": "MIT",
+  "grid": 20,
+  "icons": {
+    "new": "document_add",
+    "folder": "folder_open",
+    "save": "save",
+    "examples": "book_open",
+    "undo": "arrow_undo",
+    "redo": "arrow_redo",
+    "window": "window",
+    "cube": "cube",
+    "layout": "panel_left",
+    "dock": "panel_right_contract",
+    "stop": "stop",
+    "play": "play",
+    "run-current": "play",
+    "run-selected": "arrow_clockwise",
+    "step": "next",
+    "pan": "hand_left",
+    "select": "cursor",
+    "fit": "full_screen_maximize",
+    "points": "data_scatter",
+    "flow": "branch",
+    "maximize": "full_screen_maximize",
+    "operator:regions": "shape_intersect",
+    "operator:edges": "line_dashes",
+    "operator:filter": "options",
+    "operator:gray": "color",
+    "operator:shapematch": "target",
+    "operator:nccmatch": "image_search",
+    "operator:contourfilter": "filter",
+    "operator:linefit": "line",
+    "operator:circlefit": "circle",
+    "operator:measure": "ruler",
+    "operator:judge": "checkbox_checked",
+    "operator:contourprocess": "bezier_curve_square",
+    "operator:ellipsefit": "oval",
+    "operator:regionmorph": "shape_union",
+    "operator:regionfilter": "filter_add",
+    "operator:regionfeatures": "data_histogram",
+    "operator:regionboolean": "shape_subtract",
+    "operator:scalecalibration": "scale_fit",
+    "operator:imagemorph": "border_inside",
+    "operator:imageaffine": "arrow_move",
+    "operator:imagegradient": "color_line",
+    "operator:imageenhance": "image_sparkle",
+    "operator:calibrationdetect": "grid",
+    "operator:imagerectify": "select_object_skew",
+    "operator:planemeasure": "ruler",
+    "operator:stereorectify": "align_center_horizontal",
+    "operator:stereodisparity": "layer_diagonal",
+    "operator:stereoreconstruct": "cube",
+    "operator:cloudselect": "lasso",
+    "operator:cloudmeasure": "ruler",
+    "operator:stereoimage": "image_copy",
+    "operator:disparityfilter": "options",
+    "operator:structureddecode": "barcode_scanner",
+    "operator:structuredreconstruct": "cube_multiple",
+    "operator:structuredimage": "image_stack",
+    "operator:imageinput": "image",
+    "operator:sequenceinput": "image_multiple"
+  },
+  "operators": {
+    "Regions": "operator:regions",
+    "Edges": "operator:edges",
+    "Filter": "operator:filter",
+    "Gray": "operator:gray",
+    "ShapeMatch": "operator:shapematch",
+    "NccMatch": "operator:nccmatch",
+    "ContourFilter": "operator:contourfilter",
+    "LineFit": "operator:linefit",
+    "CircleFit": "operator:circlefit",
+    "Measure": "operator:measure",
+    "Judge": "operator:judge",
+    "ContourProcess": "operator:contourprocess",
+    "EllipseFit": "operator:ellipsefit",
+    "RegionMorph": "operator:regionmorph",
+    "RegionFilter": "operator:regionfilter",
+    "RegionFeatures": "operator:regionfeatures",
+    "RegionBoolean": "operator:regionboolean",
+    "ScaleCalibration": "operator:scalecalibration",
+    "ImageMorph": "operator:imagemorph",
+    "ImageAffine": "operator:imageaffine",
+    "ImageGradient": "operator:imagegradient",
+    "ImageEnhance": "operator:imageenhance",
+    "CalibrationDetect": "operator:calibrationdetect",
+    "ImageRectify": "operator:imagerectify",
+    "PlaneMeasure": "operator:planemeasure",
+    "StereoRectify": "operator:stereorectify",
+    "StereoDisparity": "operator:stereodisparity",
+    "StereoReconstruct": "operator:stereoreconstruct",
+    "CloudSelect": "operator:cloudselect",
+    "CloudMeasure": "operator:cloudmeasure",
+    "StereoImage": "operator:stereoimage",
+    "DisparityFilter": "operator:disparityfilter",
+    "StructuredDecode": "operator:structureddecode",
+    "StructuredReconstruct": "operator:structuredreconstruct",
+    "StructuredImage": "operator:structuredimage",
+    "ImageInput": "operator:imageinput",
+    "SequenceInput": "operator:sequenceinput"
+  },
+  "files": [
+    {
+      "file": "align_center_horizontal.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Align%20Center%20Horizontal/SVG/ic_fluent_align_center_horizontal_20_regular.svg",
+      "sha256": "d4d8f4d5bc4d86c2154c900638b334cc4178a726a59890a0875174a17533782b"
+    },
+    {
+      "file": "arrow_clockwise.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Arrow%20Clockwise/SVG/ic_fluent_arrow_clockwise_20_regular.svg",
+      "sha256": "ab803364462aa202e1d26eb8fec8ff988c108f742e62b1442a0db4e0d3304800"
+    },
+    {
+      "file": "arrow_move.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Arrow%20Move/SVG/ic_fluent_arrow_move_20_regular.svg",
+      "sha256": "805e5c7f86ade11d7bdb0610e14d2f544655cda4689615e5559a367ae005fde7"
+    },
+    {
+      "file": "arrow_redo.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Arrow%20Redo/SVG/ic_fluent_arrow_redo_20_regular.svg",
+      "sha256": "374ec6ed97949ac3ae5ec6739c283f16a4a56fa7ad374b33e0b15d4d2154b991"
+    },
+    {
+      "file": "arrow_undo.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Arrow%20Undo/SVG/ic_fluent_arrow_undo_20_regular.svg",
+      "sha256": "a6f6566eb86df531ce5332ab4153b056fb8ff8af37655058f30afaf127892a2f"
+    },
+    {
+      "file": "barcode_scanner.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Barcode%20Scanner/SVG/ic_fluent_barcode_scanner_20_regular.svg",
+      "sha256": "0416bf980489a6e96965b2dbd0ed8d93a070e1e05d98eb238e6c555a7e0f2d23"
+    },
+    {
+      "file": "book_open.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Book%20Open/SVG/ic_fluent_book_open_20_regular.svg",
+      "sha256": "902200bc2ca473ed6a3087029fb36638feeca826531e1f92a1d0da2a4a11cb96"
+    },
+    {
+      "file": "border_inside.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Border%20Inside/SVG/ic_fluent_border_inside_20_regular.svg",
+      "sha256": "9801d33c4c18b9a791819c0f249ff41e74a110c1e6061dda4ea045ce4fb676be"
+    },
+    {
+      "file": "branch.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Branch/SVG/ic_fluent_branch_20_regular.svg",
+      "sha256": "fff80f5bd49ca8f12fa2263ea003e11a7c950fb55dde8d0c6d13da3f14c01f09"
+    },
+    {
+      "file": "checkbox_checked.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Checkbox%20Checked/SVG/ic_fluent_checkbox_checked_20_regular.svg",
+      "sha256": "78ea9c62ac7698f40ae6cccb8c26348b5409def335bbda8376a9b2cf8ce5e08d"
+    },
+    {
+      "file": "circle.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Circle/SVG/ic_fluent_circle_20_regular.svg",
+      "sha256": "039fc0cb4a21cbf2a52fdd5590a7eda55cd614a397bc7441925a5ac2bfc38f37"
+    },
+    {
+      "file": "color.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Color/SVG/ic_fluent_color_20_regular.svg",
+      "sha256": "83a3831acc8fd89f68f68ee6746d9c519dc372a0ab70ccc4a01c728b6ab1549b"
+    },
+    {
+      "file": "color_line.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Color%20Line/SVG/ic_fluent_color_line_20_regular.svg",
+      "sha256": "ad654afffeb7ca823910ab1074129ae5b0f38311aab02f84715210d2ae838e4b"
+    },
+    {
+      "file": "cube.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Cube/SVG/ic_fluent_cube_20_regular.svg",
+      "sha256": "b093bde5db589527c58f35d0a472c808489ec7795bf5201c22df5e9119064b5d"
+    },
+    {
+      "file": "cube_multiple.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Cube%20Multiple/SVG/ic_fluent_cube_multiple_20_regular.svg",
+      "sha256": "1bd7e44f7b8a2ab13488c234933ae9cec153f44ff942763fff50f66febfb7849"
+    },
+    {
+      "file": "cursor.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Cursor/SVG/ic_fluent_cursor_20_regular.svg",
+      "sha256": "677c256bb99cd57a4189396fc836b669caae8084f5dfdd72c08969afe843a416"
+    },
+    {
+      "file": "data_histogram.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Data%20Histogram/SVG/ic_fluent_data_histogram_20_regular.svg",
+      "sha256": "a5efc68b301c7a7c3dbcff7c5c9b1fe9131c49903e4842443c0f2b03b04eb9eb"
+    },
+    {
+      "file": "data_scatter.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Data%20Scatter/SVG/ic_fluent_data_scatter_20_regular.svg",
+      "sha256": "43491367d8b31491c1c2e22815d50bab7ef3307f282f70f50357cb257f2832b0"
+    },
+    {
+      "file": "document_add.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Document%20Add/SVG/ic_fluent_document_add_20_regular.svg",
+      "sha256": "c1f4e03272d61879004fc466c3e0686d283e282521aa4b3802af740ec4156361"
+    },
+    {
+      "file": "filter.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Filter/SVG/ic_fluent_filter_20_regular.svg",
+      "sha256": "e68771cba4653937ebbe31d0c24f5afa61b30c71571bd55dd7d4068b0383ea35"
+    },
+    {
+      "file": "filter_add.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Filter%20Add/SVG/ic_fluent_filter_add_20_regular.svg",
+      "sha256": "27a70cf0f62ee76765e842edc6095c954c16cb2177f4ffdfb5b69795d539ce59"
+    },
+    {
+      "file": "folder_open.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Folder%20Open/SVG/ic_fluent_folder_open_20_regular.svg",
+      "sha256": "c5f8b2db9af20a454c1f05ce6eda4b21c99f1b8677b14b6d7d07d5817140a487"
+    },
+    {
+      "file": "full_screen_maximize.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Full%20Screen%20Maximize/SVG/ic_fluent_full_screen_maximize_20_regular.svg",
+      "sha256": "bcef45dfd2fc91dfef2e06079278330f774557a49451fe07b51834b1d65859ea"
+    },
+    {
+      "file": "grid.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Grid/SVG/ic_fluent_grid_20_regular.svg",
+      "sha256": "ad71db325e5c3521696f990a485a39d812871033ec85cbcc73b0ca0cbf50a55e"
+    },
+    {
+      "file": "hand_left.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Hand%20Left/SVG/ic_fluent_hand_left_20_regular.svg",
+      "sha256": "9cec8b15c8551671c1153007943446dca706f0c1b1613753c086e284b4847e04"
+    },
+    {
+      "file": "image.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Image/SVG/ic_fluent_image_20_regular.svg",
+      "sha256": "3a0db668b30da746f0bf6805c9c95debf35d1180aa3e7033b9409898f7e3c876"
+    },
+    {
+      "file": "image_copy.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Image%20Copy/SVG/ic_fluent_image_copy_20_regular.svg",
+      "sha256": "e0c8fa8915f1e91eadfd3ec4d168a10cfa5cf4680f6ef5b07c854d3dd7fa828d"
+    },
+    {
+      "file": "image_multiple.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Image%20Multiple/SVG/ic_fluent_image_multiple_20_regular.svg",
+      "sha256": "838dc52d7065084e12f61591872c99b09d1f901ad44482c7dd8ab55926cf81b1"
+    },
+    {
+      "file": "image_search.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Image%20Search/SVG/ic_fluent_image_search_20_regular.svg",
+      "sha256": "89d65518454f155c3ac671e48cbf92a39e9a7d8beb187dea3381f6f37e1de085"
+    },
+    {
+      "file": "image_sparkle.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Image%20Sparkle/SVG/ic_fluent_image_sparkle_20_regular.svg",
+      "sha256": "36e8b11661b371d8a73fe4b6ff318e1726c486b2662032f28a94bde071de5f60"
+    },
+    {
+      "file": "image_stack.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Image%20Stack/SVG/ic_fluent_image_stack_20_regular.svg",
+      "sha256": "5100963848d3349e199165f6de05b98254aae7765e6e805e6fd0b98a8e161e67"
+    },
+    {
+      "file": "lasso.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Lasso/SVG/ic_fluent_lasso_20_regular.svg",
+      "sha256": "1b8d00ddde0eaaf83fe8dc785da913de9ba8dc75591459e13408c9b829c58e1b"
+    },
+    {
+      "file": "layer_diagonal.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Layer%20Diagonal/SVG/ic_fluent_layer_diagonal_20_regular.svg",
+      "sha256": "3febdf5108712f6e89407d46b3a9af55850113d98e4608346709eb1ff53d0a10"
+    },
+    {
+      "file": "line.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Line/SVG/ic_fluent_line_20_regular.svg",
+      "sha256": "7a1cc59dc8fc6fad6ac8e6c66437696be349cd55785a790c38da3dbd3619a350"
+    },
+    {
+      "file": "line_dashes.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Line%20Dashes/SVG/ic_fluent_line_dashes_20_regular.svg",
+      "sha256": "86c23a9b89aca13f8914ba47655a98e229401a3a31e0ece936a87c24bdb73317"
+    },
+    {
+      "file": "next.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Next/SVG/ic_fluent_next_20_regular.svg",
+      "sha256": "81ef6555ecdd9cb74c5360a96d892571778997efb0f7edb14dce759ed5888486"
+    },
+    {
+      "file": "options.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Options/SVG/ic_fluent_options_20_regular.svg",
+      "sha256": "eeda1235eeb61dab0e9e23386c052fd0f0715a5112b90091ba37e2764557067c"
+    },
+    {
+      "file": "oval.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Oval/SVG/ic_fluent_oval_20_regular.svg",
+      "sha256": "18a6d8abc58ec229e56787e68360417668971187d26d291b52f1c5f851377332"
+    },
+    {
+      "file": "panel_left.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Panel%20Left/SVG/ic_fluent_panel_left_20_regular.svg",
+      "sha256": "be665db4761d910a85eddf2c55dbcaffb816bbc46d2c1c1e68377220c776009f"
+    },
+    {
+      "file": "panel_right_contract.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Panel%20Right%20Contract/SVG/ic_fluent_panel_right_contract_20_regular.svg",
+      "sha256": "30f0b72c4c205a991d65d5eaaee59d0001e5eb43eeda2d040f90c186e25dc75b"
+    },
+    {
+      "file": "play.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Play/SVG/ic_fluent_play_20_regular.svg",
+      "sha256": "0666c1378f63d4d5c32f91b4107086bc14799dff306027976be591da8843ae45"
+    },
+    {
+      "file": "ruler.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Ruler/SVG/ic_fluent_ruler_20_regular.svg",
+      "sha256": "29ff61cf92ce98355c845c3be68c973bb1763e197574ca085cc862fec00cbb12"
+    },
+    {
+      "file": "save.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Save/SVG/ic_fluent_save_20_regular.svg",
+      "sha256": "fdfbcf9c469ff958782a3f8ab4659c7f1c48062752bb6324b07e5bbb70f52969"
+    },
+    {
+      "file": "scale_fit.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Scale%20Fit/SVG/ic_fluent_scale_fit_20_regular.svg",
+      "sha256": "c7da64e49da8bcbf05ff5dd7bd94b8af367b189ec3aba739b8961662a1c95dee"
+    },
+    {
+      "file": "shape_intersect.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Shape%20Intersect/SVG/ic_fluent_shape_intersect_20_regular.svg",
+      "sha256": "35f021a7c25927a9beeed23d0d141b4fc205616781819bca397d5390317bc718"
+    },
+    {
+      "file": "shape_subtract.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Shape%20Subtract/SVG/ic_fluent_shape_subtract_20_regular.svg",
+      "sha256": "0483d12e23879a849c0dcbb2fd162bc936285ae0d669378ad944f8606c679851"
+    },
+    {
+      "file": "shape_union.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Shape%20Union/SVG/ic_fluent_shape_union_20_regular.svg",
+      "sha256": "760aea09ed61ddc7368ee67d731a52856cb1b2417846f081fe896f768792ebd6"
+    },
+    {
+      "file": "stop.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Stop/SVG/ic_fluent_stop_20_regular.svg",
+      "sha256": "8023e072d92bf65ac7647ae651d828d083834abc2eee1a2d24d64e10815d493a"
+    },
+    {
+      "file": "target.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Target/SVG/ic_fluent_target_20_regular.svg",
+      "sha256": "52e391515fc3ca72a181ee7a9f17f244725d5102666121f67763ce30d772f9f4"
+    },
+    {
+      "file": "window.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Window/SVG/ic_fluent_window_20_regular.svg",
+      "sha256": "98b90c9451284d6037e27f1c4c6f97589eb29a6521856dfd03d225f0b399b4f5"
+    },
+    {
+      "file": "LICENSE",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/LICENSE",
+      "sha256": "69bc45dc42b9acb96a69823adbc6ae538374e3c0bde169b855b32c48eaaef52f"
+    },
+    {
+      "file": "bezier_curve_square.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Bezier%20Curve%20Square/SVG/ic_fluent_bezier_curve_square_20_regular.svg",
+      "sha256": "d3848ee9e364bb61b02dd765db33633c88e91ce58782305aec82f72cc768d14e"
+    },
+    {
+      "file": "select_object_skew.svg",
+      "source": "https://raw.githubusercontent.com/microsoft/fluentui-system-icons/9eb184e96268d3293462f9d9d19225b4c7b07774/assets/Select%20Object%20Skew/SVG/ic_fluent_select_object_skew_20_regular.svg",
+      "sha256": "325976c72d3bcc3709f4347dc2cbdefae8ad4a77b4bfed085e1688f85204d9d8"
+    }
+  ]
+}

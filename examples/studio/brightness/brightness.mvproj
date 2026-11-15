@@ -1,0 +1,1621 @@
+{
+    "active": 0,
+    "angleConvention": "image-clockwise",
+    "basicParameters": {
+        "algorithm": "regions",
+        "angleExtent": 20,
+        "angleStart": -10,
+        "comparisonAsset": {
+        },
+        "comparisonName": "",
+        "edgeHigh": 40,
+        "edgeLow": 18,
+        "filter": 0,
+        "gray": 0,
+        "mask": 7,
+        "matches": 1,
+        "maximum": 255,
+        "minimum": 105,
+        "minimumArea": 0,
+        "opening": 0,
+        "options": {
+        },
+        "score": 0.7,
+        "sigma": 1.2,
+        "template": ""
+    },
+    "debugNodeId": "",
+    "format": "mvkit-studio",
+    "images": [
+        {
+            "format": "mvkit-workbench",
+            "image": "../data/synthetic/d5ada16157923ff2/normal.png",
+            "nodeSettings": [
+                {
+                    "calibrationSource": -2,
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "inputs": {
+                    },
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "calibrationSource": -2,
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "inputs": {
+                        "Image": {
+                            "node": 0,
+                            "output": "image"
+                        }
+                    },
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "calibrationSource": -2,
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "inputs": {
+                        "Image": {
+                            "node": 0,
+                            "output": "image"
+                        },
+                        "Region": {
+                            "node": 1,
+                            "output": "result"
+                        }
+                    },
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": 1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 2,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "calibrationSource": -2,
+                    "dataA": 2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "inputs": {
+                        "ObjectA": {
+                            "node": 2,
+                            "output": "result"
+                        }
+                    },
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            ],
+            "parameters": {
+                "algorithm": "regions",
+                "angleExtent": 20,
+                "angleStart": -10,
+                "comparisonAsset": {
+                },
+                "comparisonName": "",
+                "edgeHigh": 40,
+                "edgeLow": 18,
+                "filter": 0,
+                "gray": 0,
+                "mask": 7,
+                "matches": 1,
+                "maximum": 255,
+                "minimum": 105,
+                "minimumArea": 0,
+                "opening": 0,
+                "options": {
+                },
+                "score": 0.7,
+                "sigma": 1.2,
+                "template": ""
+            },
+            "rangeOverrides": [
+                false,
+                false,
+                false,
+                false
+            ],
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": "none",
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "sourceInputs": {
+                "image": {
+                    "files": [
+                        "../data/synthetic/d5ada16157923ff2/normal.png"
+                    ],
+                    "keys": [
+                        "fd3b32ada264f054fb0fbdc428b74beb4e70d575db476b4fa89b7ee48a59b3f8"
+                    ],
+                    "sequence": false,
+                    "views": [
+                    ]
+                }
+            },
+            "version": 1,
+            "workbenchOverrides": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "workbenchRanges": [
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            ]
+        },
+        {
+            "format": "mvkit-workbench",
+            "image": "../data/synthetic/abdc77f6b4815235/dim.png",
+            "nodeSettings": [
+                {
+                    "calibrationSource": -2,
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "inputs": {
+                    },
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "calibrationSource": -2,
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "inputs": {
+                        "Image": {
+                            "node": 0,
+                            "output": "image"
+                        }
+                    },
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "calibrationSource": -2,
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "inputs": {
+                        "Image": {
+                            "node": 0,
+                            "output": "image"
+                        },
+                        "Region": {
+                            "node": 1,
+                            "output": "result"
+                        }
+                    },
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": 1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 2,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "calibrationSource": -2,
+                    "dataA": 2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "inputs": {
+                        "ObjectA": {
+                            "node": 2,
+                            "output": "result"
+                        }
+                    },
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            ],
+            "parameters": {
+                "algorithm": "regions",
+                "angleExtent": 20,
+                "angleStart": -10,
+                "comparisonAsset": {
+                },
+                "comparisonName": "",
+                "edgeHigh": 40,
+                "edgeLow": 18,
+                "filter": 0,
+                "gray": 0,
+                "mask": 7,
+                "matches": 1,
+                "maximum": 255,
+                "minimum": 105,
+                "minimumArea": 0,
+                "opening": 0,
+                "options": {
+                },
+                "score": 0.7,
+                "sigma": 1.2,
+                "template": ""
+            },
+            "rangeOverrides": [
+                false,
+                false,
+                false,
+                false
+            ],
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": "none",
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "sourceInputs": {
+                "image": {
+                    "files": [
+                        "../data/synthetic/abdc77f6b4815235/dim.png"
+                    ],
+                    "keys": [
+                        "963229028a8463d74bd27e5f9e699724585ba34bc7baddc49ba9c3f70d2aac49"
+                    ],
+                    "sequence": false,
+                    "views": [
+                    ]
+                }
+            },
+            "version": 1,
+            "workbenchOverrides": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "workbenchRanges": [
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                {
+                    "dataA": -2,
+                    "dataB": -2,
+                    "exclusions": [
+                    ],
+                    "iteratePose": false,
+                    "modelId": "",
+                    "poseInstance": 0,
+                    "poseReferenceSet": false,
+                    "poseSource": -1,
+                    "referenceAngle": 0,
+                    "referenceModelKey": "",
+                    "referencePixelKey": "",
+                    "referenceSize": [
+                        -1,
+                        -1
+                    ],
+                    "referenceX": 0,
+                    "referenceY": 0,
+                    "regionSource": -1,
+                    "roi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    },
+                    "scope": 0,
+                    "templateRoi": {
+                        "angle": 0,
+                        "height": 0,
+                        "innerRatio": 0.5,
+                        "kind": 0,
+                        "width": 0,
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            ]
+        }
+    ],
+    "mode": "workflow",
+    "models": [
+    ],
+    "nodeAliases": [
+        "图像输入",
+        "区域分割",
+        "灰度统计",
+        "公差判定"
+    ],
+    "nodeIds": [
+        "de8bab83-3143-41bf-a8e4-3ab1d10a63b3",
+        "26123852-485c-40fa-b349-458eec218f4e",
+        "40ad51ca-8deb-4acb-9f3e-2b2a731c5363",
+        "38425f0e-706c-4224-94f2-0e4f1242b8cf"
+    ],
+    "selectedNode": 2,
+    "sharedRanges": [
+        {
+            "calibrationSource": -2,
+            "dataA": -2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "inputs": {
+            },
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": -1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 0,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "calibrationSource": -2,
+            "dataA": -2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "inputs": {
+                "Image": {
+                    "node": 0,
+                    "output": "image"
+                }
+            },
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": -1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 0,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "calibrationSource": -2,
+            "dataA": -2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "inputs": {
+                "Image": {
+                    "node": 0,
+                    "output": "image"
+                },
+                "Region": {
+                    "node": 1,
+                    "output": "result"
+                }
+            },
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": 1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 2,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "calibrationSource": -2,
+            "dataA": 2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "inputs": {
+                "ObjectA": {
+                    "node": 2,
+                    "output": "result"
+                }
+            },
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": -1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 0,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        }
+    ],
+    "version": 20,
+    "workbenchRanges": [
+        {
+            "dataA": -2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": -1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 0,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "dataA": -2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": -1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 0,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "dataA": -2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": -1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 0,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "dataA": -2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": -1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 0,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "dataA": -2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": -1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 0,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "dataA": -2,
+            "dataB": -2,
+            "exclusions": [
+            ],
+            "iteratePose": false,
+            "modelId": "",
+            "poseInstance": 0,
+            "poseReferenceSet": false,
+            "poseSource": -1,
+            "referenceAngle": 0,
+            "referenceModelKey": "",
+            "referencePixelKey": "",
+            "referenceSize": [
+                -1,
+                -1
+            ],
+            "referenceX": 0,
+            "referenceY": 0,
+            "regionSource": -1,
+            "roi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            },
+            "scope": 0,
+            "templateRoi": {
+                "angle": 0,
+                "height": 0,
+                "innerRatio": 0.5,
+                "kind": 0,
+                "width": 0,
+                "x": 0,
+                "y": 0
+            }
+        }
+    ],
+    "workflow": [
+        {
+            "parameters": {
+                "algorithm": "image_input",
+                "angleExtent": 20,
+                "angleStart": -10,
+                "comparisonAsset": {
+                },
+                "comparisonName": "",
+                "edgeHigh": 40,
+                "edgeLow": 18,
+                "filter": 0,
+                "gray": 0,
+                "mask": 7,
+                "matches": 1,
+                "maximum": 255,
+                "minimum": 105,
+                "minimumArea": 50,
+                "opening": 0,
+                "options": {
+                    "binding": "image"
+                },
+                "score": 0.7,
+                "sigma": 1.2,
+                "template": ""
+            }
+        },
+        {
+            "parameters": {
+                "algorithm": "regions",
+                "angleExtent": 20,
+                "angleStart": -10,
+                "comparisonAsset": {
+                },
+                "comparisonName": "",
+                "edgeHigh": 40,
+                "edgeLow": 18,
+                "filter": 0,
+                "gray": 0,
+                "mask": 7,
+                "matches": 1,
+                "maximum": 255,
+                "minimum": 105,
+                "minimumArea": 50,
+                "opening": 0,
+                "options": {
+                    "thresholdMethod": 1
+                },
+                "score": 0.7,
+                "sigma": 1.2,
+                "template": ""
+            }
+        },
+        {
+            "parameters": {
+                "algorithm": "gray_stats",
+                "angleExtent": 20,
+                "angleStart": -10,
+                "comparisonAsset": {
+                },
+                "comparisonName": "",
+                "edgeHigh": 40,
+                "edgeLow": 18,
+                "filter": 0,
+                "gray": 0,
+                "mask": 7,
+                "matches": 1,
+                "maximum": 255,
+                "minimum": 105,
+                "minimumArea": 50,
+                "opening": 0,
+                "options": {
+                    "mode": 0
+                },
+                "score": 0.7,
+                "sigma": 1.2,
+                "template": ""
+            }
+        },
+        {
+            "parameters": {
+                "algorithm": "judge",
+                "angleExtent": 20,
+                "angleStart": -10,
+                "comparisonAsset": {
+                },
+                "comparisonName": "",
+                "edgeHigh": 40,
+                "edgeLow": 18,
+                "filter": 0,
+                "gray": 0,
+                "mask": 7,
+                "matches": 1,
+                "maximum": 255,
+                "minimum": 105,
+                "minimumArea": 50,
+                "opening": 0,
+                "options": {
+                    "lower": 160,
+                    "upper": 200
+                },
+                "score": 0.7,
+                "sigma": 1.2,
+                "template": ""
+            }
+        }
+    ],
+    "workflowInputs": [
+        -2,
+        0,
+        0,
+        -2
+    ],
+    "workflowLinks": [
+        [
+        ],
+        [
+            0
+        ],
+        [
+            1
+        ],
+        [
+            2
+        ]
+    ],
+    "workflowOutput": 3,
+    "workflowPositions": [
+        [
+            0,
+            0
+        ],
+        [
+            45,
+            120
+        ],
+        [
+            260,
+            120
+        ],
+        [
+            475,
+            120
+        ],
+        [
+            690,
+            120
+        ]
+    ]
+}

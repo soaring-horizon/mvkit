@@ -22,6 +22,7 @@
 #endif
 
 #include <core/exception.hpp>
+#include <core/numeric_predicates.hpp>
 #include <imageproc/border.hpp>
 #include <imageproc/execution_context.hpp>
 #include <imageproc/image_view.hpp>
@@ -797,7 +798,9 @@ mv::core::Image median_image(const mv::core::Image& image,
                              BorderMode border,
                              double constant_gray) {
   validate_filter_image(image, "median_image");
-  if (!std::isfinite(constant_gray)) {
+  // Classify without an FP comparison: an unused subnormal border constant
+  // must not raise MXCSR's denormal-operand flag, even for an empty domain.
+  if (!mv::core::is_finite(constant_gray)) {
     throw mv::core::Exception(mv::core::Status::InvalidArgument, "median_image", "constant gray value must be finite");
   }
   if (radius == 0) return image.clone();

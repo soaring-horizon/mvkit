@@ -110,26 +110,24 @@ Measurement measure(const XldContour& contour) {
                     "centroid is not representable");
   return result;
 }
-Region raster(const XldContour& contour, ContourRegionMode mode) {
+Region raster(const XldContour& contour, ContourRegionMode mode, Neighborhood neighborhood) {
   validate(contour, "gen_region_contour_xld");
   if (contour.empty()) return {};
   ExecutionContext context;
   std::pmr::vector<RegionRun> runs{context.scratch_resource()};
-  Tuple rows, columns;
+  const bool four=neighborhood==Neighborhood::Four;
   const auto points = contour.points();
   for (std::size_t i = 0; i < points.size(); ++i) {
-    auto y = static_cast<std::int64_t>(std::round(points[i].row));
-    auto x = static_cast<std::int64_t>(std::round(points[i].col));
+    // Nearest pixel, with half ties towards +infinity. Unlike round(), this
+    // commutes with integer translations across the coordinate origin.
+    auto y = static_cast<std::int64_t>(std::floor(points[i].row + .5));
+    auto x = static_cast<std::int64_t>(std::floor(points[i].col + .5));
     auto yy = static_cast<std::int64_t>(
-        std::round(points[(i + 1) % points.size()].row));
+        std::floor(points[(i + 1) % points.size()].row + .5));
     auto xx = static_cast<std::int64_t>(
-        std::round(points[(i + 1) % points.size()].col));
-    if (mode == ContourRegionMode::Filled) {
-      rows.append(y);
-      columns.append(x);
-    }
+        std::floor(points[(i + 1) % points.size()].col + .5));
     // 规范端点次序使 Bresenham 同值选择不依赖遍历方向。
-    if (y > yy || (y == yy && x > xx)) {
+    if (!four && (y > yy || (y == yy && x > xx))) {
       std::swap(y, yy);
       std::swap(x, xx);
     }
@@ -148,21 +146,30 @@ Region raster(const XldContour& contour, ContourRegionMode mode) {
       } else
         runs.push_back({y, x, x});
       if (x == xx && y == yy) break;
+      if(four) {
+        // Four-connected Bresenham makes one cardinal move per step. Its
+        // accumulated line error selects the axis. Equidistant choices advance
+        // the shorter axis, with row priority for equal extents.
+        if(error>0 || (error==0 && dx<-dy)){error+=2*dy;x+=sx;}
+        else {error+=2*dx;y+=sy;}
+        continue;
+      }
       const auto twice = 2 * error;
-      if (twice >= dy) {
+      const bool move_x=twice>=dy,move_y=twice<=dx;
+      if (move_x) {
         error += dy;
         x += sx;
       }
-      if (twice <= dx) {
+      if (move_y) {
         error += dx;
         y += sy;
       }
     }
   }
   auto margin = Region::from_runs(runs);
-  if (mode == ContourRegionMode::Filled && points.size() >= 3)
-    return margin.united(
-        mv::regionproc::gen_region_polygon_filled(rows, columns));
+  if (mode == ContourRegionMode::Filled)
+    return mv::regionproc::fill_up(margin,four?mv::regionproc::Connectivity::Eight:
+                                             mv::regionproc::Connectivity::Four);
   return margin;
 }
 }  // namespace
@@ -233,18 +240,20 @@ AreaCenterXldResult area_center_xld(const mv::core::XldContours& contours, bool 
   return result;
 }
 mv::core::Regions gen_region_contour_xld(const mv::core::XldContours& contours,
-                                         ContourRegionMode mode) {
+                                         ContourRegionMode mode,Neighborhood neighborhood) {
   if (mode != ContourRegionMode::Filled && mode != ContourRegionMode::Margin)
     throw Exception(Status::InvalidArgument, ErrorCode::InvalidValue,
                     "gen_region_contour_xld", "Mode", -1,
                     "expected Filled or Margin");
+  if(neighborhood!=Neighborhood::Four && neighborhood!=Neighborhood::Eight)
+    throw Exception(Status::InvalidArgument,"gen_region_contour_xld","expected 4 or 8 neighborhood");
   ExecutionContext context;
   std::pmr::vector<Region> regions(contours.contour_count(),
                                    context.scratch_resource());
   ExecutionContext::for_each_partition(
       regions.size(), work_size(contours), 32768, [&](auto range) {
         for (auto i = range.begin; i < range.end; ++i)
-          regions[i] = raster(contours.contour(i), mode);
+          regions[i] = raster(contours.contour(i), mode,neighborhood);
       });
   std::vector<IconicValue> objects;
   objects.reserve(regions.size());

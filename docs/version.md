@@ -1,15 +1,34 @@
-# mvkit 0.1.0
+# MVKit 发布记录
 
-mvkit 的首个公开版本，提供面向工业机器视觉的 C11 和 C++14 接口，库实现使用 C++20。
+## 0.2.0
 
-- 图像处理、Region 与形态学、XLD 亚像素轮廓处理与拟合。
-- Shape/NCC 模板匹配，相机标定与几何变换，双目、结构光及三维点云处理。
+计划发布日期 **2026-11-15**（待发布确认）。
+
+0.2.0 增加 Windows x64 桌面工作台 MV Studio。SDK 继续提供 C11 和 C++14 接口，可通过 CMake 目标 `mvkit::C` 与 `mvkit::CXX` 接入。
+
+- 工作流支持具名输入和输出。双目校正输出的左右图可分别连接下游；结构光解码可直接提供投影坐标、有效域和其他结果。
+- 支持单目、双目和相机与投影仪的标定工作流。SDK 更新了联合求解和圆点板检测。
+- 支持查看重建点云、平面和球体拟合残差。选择有有效三维结果的节点时自动显示 3D 视图。
+- 附 10 个 Studio 示例，覆盖二维检测、定位与尺寸测量、双目及结构光重建。机加工件重建示例附有几何真值。
+- 更新区域、边缘和模板匹配的部分实现，以及 TIFF 读写与映射处理。
+- Windows 支持 VS2019、VS2022 与 VS2026。Ubuntu 提供独立 SDK 构建入口。
+
+公开 SDK 保持原有接口范围，包含 XLD 拟合、标定、双目、结构光和三维链路。共享库名延续 `mvkit` 与 `mvkitcpp`。版本以根 CMake 的 `0.2.0` 为准，SDK 查询和 Studio 程序使用同一版本号。
+
+查看 [MV Studio 工程界面](../README.md#mv-studio-工程界面)、[快速开始](../apps/README.md)和 [SDK 构建与安装](build.md)。
+
+## 0.1.0
+
+发布日期 **2026-10-18**。
+
+MVKit 的首个公开版本，提供面向工业机器视觉的 C11 和 C++14 接口，库实现使用 C++20。
+
+- 提供图像处理、Region 与形态学、XLD 亚像素轮廓处理与拟合。
+- 提供 Shape/NCC 模板匹配、相机标定与几何变换、双目、结构光及三维点云处理。
 - 内置内存池、可选线程池，以及运行时 CPU 特性检测和 AVX2 派发。
-- 五个独立功能 demo，分别演示 C++ 过程式与对象式调用；保留合并 demo 复现效果图。
-- 默认中文 README，提供英文 README；自有代码采用 Apache-2.0，第三方保留原有许可。
+- 提供五个功能示例，分别演示 C++ 函数式和对象式调用，并提供合并示例复现效果图。
+- 默认中文 README，另附英文版。自有代码采用 Apache-2.0，各第三方组件保留原有许可。
 
-共享库名称为 `mvkit` 和 `mvkitcpp`。Windows 对应 `mvkit.dll`、`mvkitcpp.dll`；Linux 使用带版本的 `libmvkit.so` 和 `libmvkitcpp.so`。下游 CMake 继续链接 `mvkit::C` 或 `mvkit::CXX`。
+共享库为 `mvkit` 和 `mvkitcpp`，Windows 使用 `mvkit.dll`、`mvkitcpp.dll`，Linux 使用带版本的 `libmvkit.so` 和 `libmvkitcpp.so`。下游 CMake 目标为 `mvkit::C` 和 `mvkit::CXX`。
 
-项目版本由根 CMake 统一设置为 `0.1.0`，`GetSystem("version")` 和 C 接口的对应查询返回 `0.1.0`。首个 GitHub Release 与标签均使用 `0.1.0`，在正式源码首次上传后创建。
-
-当前处于开发阶段，不保证 API/ABI 兼容。建议 fork 或固定 commit/tag 使用；本版本不提供 Measure/Metrology 等测量相关接口。
+首个 GitHub Release 与标签均为 `0.1.0`，SDK 版本查询返回 `0.1.0`。该版本的公开发行范围已排除 Measure/Metrology 专用接口。

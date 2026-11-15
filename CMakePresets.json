@@ -11,7 +11,8 @@
       "hidden": true,
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "MVKIT_BUILD_EXAMPLES": "ON"
+        "MVKIT_BUILD_EXAMPLES": "OFF",
+        "MVKIT_BUILD_WORKBENCH": "OFF"
       }
     },
     {
@@ -39,6 +40,33 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
+    },
+    {
+      "name": "windows-studio",
+      "inherits": "windows",
+      "binaryDir": "${sourceDir}/build/studio",
+      "cacheVariables": {
+        "MVKIT_BUILD_WORKBENCH": "ON",
+        "MVKIT_BUILD_EXAMPLES": "OFF"
+      }
+    },
+    {
+      "name": "windows-2022-studio",
+      "inherits": "windows-2022",
+      "binaryDir": "${sourceDir}/build/studio-2022",
+      "cacheVariables": {
+        "MVKIT_BUILD_WORKBENCH": "ON",
+        "MVKIT_BUILD_EXAMPLES": "OFF"
+      }
+    },
+    {
+      "name": "windows-2019-studio",
+      "inherits": "windows-2019",
+      "binaryDir": "${sourceDir}/build/studio-2019",
+      "cacheVariables": {
+        "MVKIT_BUILD_WORKBENCH": "ON",
+        "MVKIT_BUILD_EXAMPLES": "OFF"
+      }
     }
   ],
   "buildPresets": [
@@ -60,6 +88,45 @@
     {
       "name": "linux",
       "configurePreset": "linux"
+    },
+    {
+      "name": "windows-studio",
+      "configurePreset": "windows-studio",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-studio-package",
+      "configurePreset": "windows-studio",
+      "configuration": "Release",
+      "targets": [
+        "mvkit_studio_package"
+      ]
+    },
+    {
+      "name": "windows-2022-studio",
+      "configurePreset": "windows-2022-studio",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-2022-studio-package",
+      "configurePreset": "windows-2022-studio",
+      "configuration": "Release",
+      "targets": [
+        "mvkit_studio_package"
+      ]
+    },
+    {
+      "name": "windows-2019-studio",
+      "configurePreset": "windows-2019-studio",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-2019-studio-package",
+      "configurePreset": "windows-2019-studio",
+      "configuration": "Release",
+      "targets": [
+        "mvkit_studio_package"
+      ]
     }
   ]
 }

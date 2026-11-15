@@ -192,7 +192,7 @@ TiffLayout read_layout(TIFF* tif, const DecodeLimits& limits) {
   if (planar != PLANARCONFIG_CONTIG) {
     throw core::Exception(core::Status::Unsupported, "TiffCodec::decode", "planar-separate TIFF is not supported in ImageIO v1");
   }
-  if (sample_format != SAMPLEFORMAT_UINT) {
+  if (sample_format != SAMPLEFORMAT_UINT && sample_format != SAMPLEFORMAT_IEEEFP) {
     throw core::Exception(core::Status::Unsupported, "TiffCodec::decode", "non-unsigned TIFF samples are not supported in ImageIO v1");
   }
   if (orientation != ORIENTATION_TOPLEFT) {
@@ -205,11 +205,16 @@ TiffLayout read_layout(TIFF* tif, const DecodeLimits& limits) {
   layout.bits = bits;
   layout.samples = samples;
   layout.photometric = photometric;
-  if (samples == 1 && (photometric == PHOTOMETRIC_MINISBLACK || photometric == PHOTOMETRIC_MINISWHITE) &&
+  if (sample_format == SAMPLEFORMAT_IEEEFP && bits == 32 &&
+      ((samples == 1 && photometric == PHOTOMETRIC_MINISBLACK) ||
+       (samples == 3 && photometric == PHOTOMETRIC_RGB))) {
+    layout.format = core::PixelType::Float32;
+    layout.bytes_per_sample = samples * sizeof(float);
+  } else if (sample_format == SAMPLEFORMAT_UINT && samples == 1 && (photometric == PHOTOMETRIC_MINISBLACK || photometric == PHOTOMETRIC_MINISWHITE) &&
       (bits == 8 || bits == 16)) {
     layout.format = bits == 8 ? core::PixelType::UInt8 : core::PixelType::UInt16;
     layout.bytes_per_sample = bits / 8;
-  } else if (samples == 3 && photometric == PHOTOMETRIC_RGB && bits == 8) {
+  } else if (sample_format == SAMPLEFORMAT_UINT && samples == 3 && photometric == PHOTOMETRIC_RGB && bits == 8) {
     layout.format = core::PixelType::UInt8;
     layout.bytes_per_sample = 3;
   } else {
@@ -263,17 +268,13 @@ void decode_strips(TIFF* tif, core::Image& image, const TiffLayout& layout, cons
         std::memcpy(dst + y * image.stride(0), buffer.data() + y * row_bytes, row_bytes);
       }
     } else {
-      auto* red = static_cast<std::uint8_t*>(image.mutable_data(0));
-      auto* green = static_cast<std::uint8_t*>(image.mutable_data(1));
-      auto* blue = static_cast<std::uint8_t*>(image.mutable_data(2));
-      const auto* src = reinterpret_cast<const std::uint8_t*>(buffer.data());
-      for (std::size_t y = 0; y < rows; ++y) {
-        for (std::size_t x = 0; x < layout.width; ++x) {
-          const auto offset = y * row_bytes + x * 3;
-          red[(row_start + y) * image.stride(0) + x] = src[offset];
-          green[(row_start + y) * image.stride(1) + x] = src[offset + 1];
-          blue[(row_start + y) * image.stride(2) + x] = src[offset + 2];
-        }
+      const auto scalar_bytes = layout.bytes_per_sample / layout.samples;
+      for (std::size_t c = 0; c < layout.samples; ++c) {
+        auto* dst = static_cast<std::byte*>(image.mutable_data(c));
+        for (std::size_t y = 0; y < rows; ++y)
+          for (std::size_t x = 0; x < layout.width; ++x)
+            std::memcpy(dst + (row_start+y)*image.stride(c) + x*scalar_bytes,
+                        buffer.data() + y*row_bytes + (x*layout.samples+c)*scalar_bytes, scalar_bytes);
       }
     }
   }
@@ -312,19 +313,16 @@ void decode_tiles(TIFF* tif, core::Image& image, const TiffLayout& layout, const
                       copy_bytes);
         }
       } else {
-        auto* red = static_cast<std::uint8_t*>(image.mutable_data(0));
-        auto* green = static_cast<std::uint8_t*>(image.mutable_data(1));
-        auto* blue = static_cast<std::uint8_t*>(image.mutable_data(2));
-        const auto* src = reinterpret_cast<const std::uint8_t*>(buffer.data());
-        for (std::size_t y = 0; y < copy_height; ++y) {
-          for (std::size_t x = 0; x < copy_width; ++x) {
-            const auto src_offset = y * tile_row_bytes + x * 3;
-            const auto row = static_cast<std::size_t>(y0) + y;
-            const auto column = static_cast<std::size_t>(x0) + x;
-            red[row * image.stride(0) + column] = src[src_offset];
-            green[row * image.stride(1) + column] = src[src_offset + 1];
-            blue[row * image.stride(2) + column] = src[src_offset + 2];
-          }
+        const auto scalar_bytes = layout.bytes_per_sample / layout.samples;
+        const auto needed = (copy_height-1)*tile_row_bytes + copy_width*layout.bytes_per_sample;
+        if (static_cast<std::size_t>(decoded) < needed)
+          throw core::Exception(core::Status::DecodeError, "TiffCodec::decode", "truncated TIFF tile");
+        for (std::size_t c = 0; c < layout.samples; ++c) {
+          auto* dst = static_cast<std::byte*>(image.mutable_data(c));
+          for (std::size_t y = 0; y < copy_height; ++y)
+            for (std::size_t x = 0; x < copy_width; ++x)
+              std::memcpy(dst + (y0+y)*image.stride(c) + (x0+x)*scalar_bytes,
+                          buffer.data() + y*tile_row_bytes + (x*layout.samples+c)*scalar_bytes, scalar_bytes);
         }
       }
     }
@@ -348,12 +346,36 @@ core::Image TiffCodec::decode(InputStream& stream, const DecodeOptions& options)
   const auto layout = read_layout(tif.get(), options.limits);
   auto image = layout.samples == 3
                    ? core::Image::create(layout.width, layout.height,
-                                         std::vector<core::PixelType>(3, core::PixelType::UInt8))
+                                         std::vector<core::PixelType>(3, layout.format))
                    : core::Image::create(layout.width, layout.height, layout.format);
   if (TIFFIsTiled(tif.get())) decode_tiles(tif.get(), image, layout, options.limits);
   else decode_strips(tif.get(), image, layout, options.limits);
   if (layout.photometric == PHOTOMETRIC_MINISWHITE) invert_miniswhite(image);
   return image;
+}
+
+std::vector<core::Image> TiffCodec::decode_all(InputStream& stream, const DecodeOptions& options) const {
+  TiffClient client;
+  auto tif = open_for_read(stream, options.limits, client);
+  std::vector<core::Image> pages;
+  std::size_t total = 0;
+  do {
+    const auto layout = read_layout(tif.get(), options.limits);
+    const auto bytes = checked_image_bytes(layout.width, layout.height, layout.bytes_per_sample, options.limits);
+    if (pages.size() >= 64 || bytes > options.limits.max_decoded_bytes - total)
+      throw core::Exception(core::Status::LimitExceeded, "TiffCodec::decode", "TIFF page tuple exceeds decode limits");
+    total += bytes;
+    auto page = core::Image::create(layout.width, layout.height,
+                                    std::vector<core::PixelType>(layout.samples, layout.format));
+    if (TIFFIsTiled(tif.get())) decode_tiles(tif.get(), page, layout, options.limits);
+    else decode_strips(tif.get(), page, layout, options.limits);
+    if (layout.photometric == PHOTOMETRIC_MINISWHITE) invert_miniswhite(page);
+    pages.push_back(std::move(page));
+    if (TIFFLastDirectory(tif.get())) break;
+    if (!TIFFReadDirectory(tif.get()))
+      throw core::Exception(core::Status::DecodeError, "TiffCodec::decode", "invalid next TIFF directory");
+  } while (true);
+  return pages;
 }
 
 void TiffCodec::encode(OutputStream& stream,

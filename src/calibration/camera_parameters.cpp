@@ -112,10 +112,9 @@ core::Tuple camera_parameters_to_tuple(const CameraParameters& params) {
     using T = std::decay_t<decltype(p)>;
     constexpr bool perspective = std::is_same_v<T, AreaScanDivisionParameters> ||
                                  std::is_same_v<T, AreaScanPolynomialParameters>;
-    const double scale = [&] {
-      if constexpr (perspective) return p.focus;
-      else return p.magnification;
-    }();
+    double scale;
+    if constexpr (perspective) scale = p.focus;
+    else scale = p.magnification;
     using core::Value;
     // 相机描述始终为定长混合元组；字段类型与顺序保持原样，一次分配完整载荷。
     if constexpr (std::is_same_v<T, AreaScanDivisionParameters> ||

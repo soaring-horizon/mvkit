@@ -11,4 +11,5 @@
 | [开发与验证环境](platform.md) | 本机硬件、Windows/WSL 环境与验证范围 |
 | [功能示例](../examples/README.md) | 原始图片、C++ 过程式与对象式演示、编译运行 |
 | [第三方组件与许可](../README.md#第三方组件与许可) | 依赖清单、来源与原始许可 |
-| [0.1.0 发布说明](version.md) | 首次公开版本、库命名与使用约定 |
+| [MV Studio](../apps/README.md) | Windows 工作台、示例和打包 |
+| [0.2.0 发布说明](version.md) | 版本更新与兼容范围 |

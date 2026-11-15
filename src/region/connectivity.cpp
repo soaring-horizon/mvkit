@@ -386,9 +386,13 @@ mv::core::Regions fill_up(const mv::core::Regions& regions, Connectivity connect
 
 mv::core::Regions fill_up(const mv::core::Regions& regions,
                           const mv::core::RuntimeContext& context) {
+  // The system setting describes foreground connectivity. A bounded hole is
+  // a component of the complementary background (8-connected foreground / 4-
+  // connected background, or conversely); explicit internal overloads take
+  // background connectivity directly.
   const auto connectivity = context.neighborhood == mv::core::Neighborhood::Four
-                                ? Connectivity::Four
-                                : Connectivity::Eight;
+                                ? Connectivity::Eight
+                                : Connectivity::Four;
   return fill_up(regions, connectivity);
 }
 

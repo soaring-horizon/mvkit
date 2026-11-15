@@ -28,7 +28,8 @@ struct Edge {
   bool used = false;
 };
 XldContours trace(std::span<const Node> nodes, std::pmr::vector<Edge>& edges,
-                  bool attributes, std::pmr::memory_resource* memory) {
+                  bool attributes, std::pmr::memory_resource* memory,
+                  std::span<const Point2d> detected_normals = {}) {
   // 等值平台可能从两个单元贡献同一网格边。
   for (auto& e : edges)
     if (e.a > e.b) std::swap(e.a, e.b);
@@ -69,17 +70,25 @@ XldContours trace(std::span<const Node> nodes, std::pmr::vector<Edge>& edges,
     return std::span<const std::size_t>{links}.subspan(begin,end-begin);
   };
   std::pmr::vector<Point2d> points{memory};
+  std::pmr::vector<Point2d> normals{memory};
   std::pmr::vector<double> response{memory}, normal{memory};
   std::pmr::vector<XldContour> contours{memory};
   auto walk = [&](std::size_t start, std::size_t edge) {
     points.clear();
     response.clear();
     normal.clear();
+    normals.clear();
+    const auto append=[&](std::size_t index) {
+      points.push_back(nodes[index].p);
+      if(attributes) {
+        response.push_back(nodes[index].response);
+        normals.push_back(detected_normals[index]);
+      }
+    };
     auto current = start;
     bool closed = false;
     while (true) {
-      points.push_back(nodes[current].p);
-      if(attributes)response.push_back(nodes[current].response);
+      append(current);
       edges[edge].used = true;
       auto next = edges[edge].a == current ? edges[edge].b : edges[edge].a;
       if (next == start) {
@@ -88,8 +97,7 @@ XldContours trace(std::span<const Node> nodes, std::pmr::vector<Edge>& edges,
       }
       current = next;
       if (adjacent(current).size() != 2) {
-        points.push_back(nodes[current].p);
-        if(attributes)response.push_back(nodes[current].response);
+        append(current);
         break;
       }
       auto candidate = none;
@@ -99,8 +107,7 @@ XldContours trace(std::span<const Node> nodes, std::pmr::vector<Edge>& edges,
           break;
         }
       if (candidate == none) {
-        points.push_back(nodes[current].p);
-        if(attributes)response.push_back(nodes[current].response);
+        append(current);
         break;
       }
       edge = candidate;
@@ -114,8 +121,23 @@ XldContours trace(std::span<const Node> nodes, std::pmr::vector<Edge>& edges,
              b = points[i + 1 < points.size() ? i + 1
                         : closed              ? 0
                                               : i];
-        normal.push_back(positive_atan2(-(b.row - a.row), b.col - a.col));
+        // Preserve the Hessian normal used for localization. Differencing
+        // nearby subpixel positions amplifies their sampling error into angle
+        // noise, especially at short segments and their endpoints. The path
+        // tangent chooses only the normal's sign, retaining the traversal side.
+        const auto n=normals[i];
+        const double side=(b.col-a.col)*n.row-(b.row-a.row)*n.col<0?-1.:1.;
+        normal.push_back(positive_atan2(side*n.col,side*n.row));
       }
+    // Public TestClosedXld tests endpoint coordinates, not the private flag.
+    // Keep the unique cycle while computing normals, then close every column.
+    if (closed) {
+      points.push_back(points.front());
+      if (attributes) {
+        response.push_back(response.front());
+        normal.push_back(normal.front());
+      }
+    }
     contours.push_back(XldContour::from_points_and_attributes(
         points, closed, ContourApproximation::Unknown,
         attributes ? std::span<const double>{response}
@@ -402,6 +424,7 @@ mv::core::XldContours lines_gauss(const mv::core::Image& image, double sigma,
     Point2d p;
     std::size_t cell=0;
     double response = 0, nr = 0, nc = 0;
+    double location_weight = 0;
   };
   std::vector<std::vector<Ridge>> row_candidates(h);
   ExecutionContext::for_each_partition(h, source.size(), 32768, [&](auto range) {
@@ -467,13 +490,12 @@ mv::core::XldContours lines_gauss(const mv::core::Image& image, double sigma,
           }
         }
 #endif
-        bool valid = true;
-        if (!full_domain) for (int dr = -1; dr <= 1; ++dr)
-          for (int dc = -1; dc <= 1; ++dc)
-            valid &= domain.contains(
-                static_cast<std::int64_t>(border(std::int64_t(r) + dr, h)),
-                static_cast<std::int64_t>(border(std::int64_t(c) + dc, w)));
-        if (!valid) continue;
+        // The domain selects candidate pixels, not the derivative support.
+        // Convolutions above read the backing image. Requiring a full 3x3
+        // domain neighborhood silently erodes endpoints and removes thin ROIs.
+        // Missing domain pixels remain absent from the graph, so holes still
+        // split a line rather than being bridged by the filter support.
+        if (!full_domain && !domain.contains(std::int64_t(r),std::int64_t(c))) continue;
         auto i = r * w + c;
         double xx = response_xx[c], yy = response_yy[c], xy = response_xy[c];
         // Gershgorin 给出谱响应界，留两倍余量，使 Low 附近舍入仍走原特征系统路径。
@@ -525,10 +547,50 @@ mv::core::XldContours lines_gauss(const mv::core::Image& image, double sigma,
   for(auto& row:row_candidates) {
     for(const auto& value:row) {
       cells[value.cell]=candidates.size();candidates.push_back(value);
+      candidates.back().location_weight=value.response;
     }
     std::vector<Ridge>{}.swap(row);
   }
-  // 相邻 Taylor 拟合可在两像素定位同一 ridge，追踪前保留强响应以避免三角捷径。
+  // Hysteresis follows neighboring localized candidate cells, before
+  // duplicate suppression and direction-based contour segmentation. A strong
+  // bead or junction can turn the dominant Hessian normal abruptly; rejecting
+  // its tracing edge must not reject an otherwise connected weak line arm.
+  // At least one endpoint must support the link's tangent; requiring both
+  // belongs to contour segmentation, while an unoriented pixel connection
+  // would also admit unrelated weak responses around a strong point.
+  // Missing domain pixels never enter cells, so this does not bridge ROI holes.
+  std::pmr::vector<std::size_t> parent(candidates.size(),memory);
+  std::pmr::vector<unsigned char> strong(candidates.size(),0,memory);
+  for(std::size_t i=0;i<candidates.size();++i){parent[i]=i;strong[i]=candidates[i].strong;}
+  const auto root=[&](std::size_t i) {
+    while(parent[i]!=i){parent[i]=parent[parent[i]];i=parent[i];}
+    return i;
+  };
+  for(std::size_t i=0;i<candidates.size();++i) {
+    const auto r=candidates[i].cell/w,c=candidates[i].cell%w;
+    for(auto [dr,dc]:std::array<std::pair<int,int>,4>{{{0,1},{1,-1},{1,0},{1,1}}}) {
+      const auto rr=std::int64_t(r)+dr,cc=std::int64_t(c)+dc;
+      if(rr<0||cc<0||rr>=std::int64_t(h)||cc>=std::int64_t(w))continue;
+      const auto j=cells[std::size_t(rr)*w+std::size_t(cc)];
+      if(j==SIZE_MAX)continue;
+      const double dy=candidates[j].p.row-candidates[i].p.row,
+                   dx=candidates[j].p.col-candidates[i].p.col,
+                   distance=ridge_length(dx,dy);
+      if(std::abs(dy*candidates[i].nr+dx*candidates[i].nc)>.6*distance &&
+         std::abs(dy*candidates[j].nr+dx*candidates[j].nc)>.6*distance)continue;
+      const auto a=root(i),b=root(j);
+      if(a!=b){parent[b]=a;strong[a]|=strong[b];}
+    }
+  }
+  for(std::size_t i=0;i<candidates.size();++i)candidates[i].active=strong[root(i)]!=0;
+  // Adjacent Taylor fits can describe the same physical ridge. At a half
+  // pixel their offsets have opposite truncation errors; discarding either
+  // fit creates a systematic phase bias. Fuse aligned duplicate locations
+  // using curvature-response weights, retaining the strongest sample's cell,
+  // normal and response for graph construction and hysteresis.
+  std::pmr::vector<Point2d> detected_normals(candidates.size(),memory);
+  for(std::size_t i=0;i<candidates.size();++i)
+    detected_normals[i]={candidates[i].nr,candidates[i].nc};
   for (std::size_t i=0;i<candidates.size();++i) {
     if (!candidates[i].active) continue;
     const auto r=candidates[i].cell/w,c=candidates[i].cell%w;
@@ -540,6 +602,24 @@ mv::core::XldContours lines_gauss(const mv::core::Image& image, double sigma,
       if(!candidates[j].active)continue;
       const auto distance=ridge_length(candidates[i].p.row-candidates[j].p.row,candidates[i].p.col-candidates[j].p.col);
       if(distance>=.5)continue;
+      auto& a=candidates[i];auto& b=candidates[j];
+      const double weight=a.location_weight+b.location_weight;
+      const bool fuse=std::abs(a.nr*b.nr+a.nc*b.nc)>=.95 &&
+          std::isfinite(weight) && weight>0;
+      Point2d location;
+      Point2d normal;
+      if(fuse) {
+        const double fraction=b.location_weight/weight;
+        location={std::lerp(a.p.row,b.p.row,fraction),std::lerp(a.p.col,b.p.col,fraction)};
+        const auto na=detected_normals[i],nb=detected_normals[j];
+        const double side=na.row*nb.row+na.col*nb.col<0?-1.:1.;
+        normal={std::lerp(na.row,side*nb.row,fraction),std::lerp(na.col,side*nb.col,fraction)};
+      }
+      auto& survivor=a.response>=b.response?a:b;
+      if(fuse){
+        survivor.p=location;survivor.location_weight=weight;
+        detected_normals[a.response>=b.response?i:j]=normal;
+      }
       if(candidates[i].response>=candidates[j].response)candidates[j].active=false;
       else {candidates[i].active=false;break;}
     }
@@ -551,7 +631,10 @@ mv::core::XldContours lines_gauss(const mv::core::Image& image, double sigma,
       ids[i] = nodes.size();
       auto v = candidates[i];
       nodes.push_back({v.p, v.response, v.strong});
+      // Compact in place: node index never exceeds the source candidate index.
+      detected_normals[ids[i]]=detected_normals[i];
     }
+  detected_normals.resize(nodes.size());
   std::pmr::vector<Edge> edges{memory};
   for (std::size_t i = 0; i < candidates.size(); ++i)
     if (ids[i] != SIZE_MAX) {
@@ -575,30 +658,31 @@ mv::core::XldContours lines_gauss(const mv::core::Image& image, double sigma,
         edges.push_back({ids[i], ids[j]});
       }
     }
-  // 连通分量迟滞使用 scratch 并查集，不反复扫描图像。
-  std::pmr::vector<std::size_t> parent(nodes.size(), memory);
-  std::pmr::vector<unsigned char> strong(nodes.size(), 0, memory);
-  for (std::size_t i = 0; i < nodes.size(); ++i) {
-    parent[i] = i;
-    strong[i] = nodes[i].strong;
-  }
-  auto root = [&](std::size_t i) {
-    while (parent[i] != i) {
-      parent[i] = parent[parent[i]];
-      i = parent[i];
-    }
-    return i;
+  // A digital ridge near a diagonal can form triangles in the 8-neighbor
+  // graph. Their longest edge is a shortcut across two consecutive samples,
+  // not a junction. Keep the relative-neighborhood graph: removing an edge
+  // with a strictly shorter two-edge path preserves connectivity while
+  // avoiding artificial degree-three vertices and contour fragmentation.
+  std::pmr::vector<std::size_t> graph_offsets(nodes.size()+1,0,memory);
+  for(const auto& edge:edges){++graph_offsets[edge.a+1];++graph_offsets[edge.b+1];}
+  for(std::size_t i=1;i<graph_offsets.size();++i)graph_offsets[i]+=graph_offsets[i-1];
+  std::pmr::vector<std::size_t> cursors(graph_offsets,memory);
+  std::pmr::vector<std::size_t> graph_neighbors(graph_offsets.back(),memory);
+  for(const auto& edge:edges){graph_neighbors[cursors[edge.a]++]=edge.b;graph_neighbors[cursors[edge.b]++]=edge.a;}
+  const auto squared_distance=[&](std::size_t a,std::size_t b){
+    const auto dr=nodes[a].p.row-nodes[b].p.row,dc=nodes[a].p.col-nodes[b].p.col;
+    return dr*dr+dc*dc;
   };
-  for (auto e : edges) {
-    auto a = root(e.a), b = root(e.b);
-    if (a != b) {
-      parent[b] = a;
-      strong[a] |= strong[b];
+  edges.erase(std::remove_if(edges.begin(),edges.end(),[&](const auto& edge){
+    const double length=squared_distance(edge.a,edge.b);
+    for(auto i=graph_offsets[edge.a];i<graph_offsets[edge.a+1];++i){
+      const auto middle=graph_neighbors[i];
+      if(!(squared_distance(edge.a,middle)<length && squared_distance(middle,edge.b)<length))continue;
+      for(auto j=graph_offsets[middle];j<graph_offsets[middle+1];++j)
+        if(graph_neighbors[j]==edge.b)return true;
     }
-  }
-  edges.erase(std::remove_if(edges.begin(), edges.end(),
-                             [&](auto e) { return !strong[root(e.a)]; }),
-              edges.end());
-  return trace(nodes, edges, true, memory);
+    return false;
+  }),edges.end());
+  return trace(nodes, edges, true, memory,detected_normals);
 }
 }  // namespace mv::xld

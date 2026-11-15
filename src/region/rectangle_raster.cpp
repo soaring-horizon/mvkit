@@ -24,7 +24,7 @@ void polygon_edge(std::int64_t y,std::int64_t x,std::int64_t yy,std::int64_t xx,
     else {run.col_begin=std::min<std::int64_t>(run.col_begin,x);run.col_end=std::max<std::int64_t>(run.col_end,x);}
     if(x==xx && y==yy)break;
     const auto twice=2*error;
-    const bool xtie=2*x+sx>0?sx>0:sx<0,ytie=2*y+1>0;
+    const bool xtie=sx>0,ytie=true;
     if(twice>dy || (twice==dy && (variant?!xtie:xtie))){error+=dy;x+=sx;}
     if(twice<dx || (twice==dx && (variant?!ytie:ytie))){error+=dx;++y;}
   }
@@ -78,17 +78,14 @@ core::Region convex_boundary_runs(const std::array<std::int64_t,4>& rows,
         const auto quotient=edge.lower.q,remainder=edge.lower.r;
         const auto standard=quotient+(2*remainder>=edge.dy);
         const bool tie=2*remainder==edge.dy;
-        // 多边形路径在绝对坐标半值处远离零取整；标准路径在步数半值处向上取整。
-        const bool away=(2*edge.x+edge.direction*(2*quotient+1)>0)==(edge.direction>0);
-        const auto polygon=quotient+(2*remainder>edge.dy || (tie && away));
+        // Polygon midpoint choices depend on direction, preserving integer
+        // translation across zero; the standard path rounds the step upward.
+        const auto polygon=quotient+(2*remainder>edge.dy || (tie && edge.direction>0));
         const auto x0=edge.x+edge.direction*standard,x1=edge.x+edge.direction*polygon;
         a=std::min(x0,x1);b=std::max(x0,x1);
       } else {
         const auto start=std::max(std::int64_t{0},edge.lower.q);
         auto finish=std::min(edge.dx,edge.upper.q);
-        // 负坐标半值的额外端点等价于偶数 dx 且上界余数为 dy-1。
-        if(row<0 && edge.dx%2==0 && edge.upper.r==edge.dy-1)
-          finish=std::min(edge.dx,edge.upper.q+1);
         const auto x0=edge.x+edge.direction*start,x1=edge.x+edge.direction*finish;
         a=std::min(x0,x1);b=std::max(x0,x1);
       }

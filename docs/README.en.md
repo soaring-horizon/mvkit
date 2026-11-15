@@ -4,17 +4,29 @@
 
 ## Overview
 
-**mvkit** is a C/C++ algorithm library for industrial machine vision. It covers image processing, feature extraction, template matching and localization, camera calibration, stereo vision, and 3D processing. Its implementation is independently developed with reference to **HALCON's operator semantics and data object organization**, using forward development to align functionality and performance. The project currently implements **277** commonly used vision operators with HALCON counterparts.
+**MVKit** is a C/C++ SDK for industrial machine vision. It uses the public HALCON interface as a reference for studying and validating machine vision software architecture and algorithms. It provides **277** corresponding operators for image processing, region and contour analysis, template matching, calibration, and 3D reconstruction. The public distribution excludes dedicated Measure/Metrology modules, code reading, deep learning, and OCR.
 
-- **The project is under development; API/ABI compatibility is not guaranteed.** Fork the repository or pin a commit/tag for use in your applications.
-- The author's professional work focuses on measurement algorithms. This version does not develop or provide **Measure/Metrology** or other measurement-specific interfaces.
-- In most tested scenarios, accuracy is broadly consistent with HALCON, with execution time approximately **1–2 times** that of HALCON.
+**MV Studio** is the companion desktop application for testing operators, building workflows, managing inputs, and inspecting 2D and 3D results.
+
+Version **0.2.0** · [Release notes](version.md) · [MV Studio quick start and build guide](../apps/README.md)
+
+The project is in active development, and API/ABI compatibility is not guaranteed. Pin a release or commit when integrating the SDK, or maintain a fork. In existing comparison tests, most cases produced accuracy comparable to HALCON, with runtimes around **1–2 times** those of HALCON in typical tested cases.
 
 The **C++ procedural and object-oriented interfaces** are recommended. Procedural calls such as `mv::Threshold(image, &regions, ...)` follow an operator-style parameter order. Object-oriented calls such as `image.Threshold(...)` organize application logic around images, regions, and models. Both styles manage resources automatically through objects and tuples and can be combined as needed. The C interface primarily serves language bindings and applications requiring explicit lifetime management.
 
-Initial version: **0.1.0** · [Release notes (Chinese)](version.md).
+## MV Studio project views
 
-## Examples
+On Windows x64, start `mv_studio.exe` from the runtime package, open a sample through the File menu, and press F5. It includes 10 projects covering 2D inspection, dimensional measurement, and 3D reconstruction. [Studio sample projects](../examples/studio/README.md)
+
+**Template positioning and dimensional measurement.** The workflow locates the part by shape matching, extracts edges in part-relative regions, and fits circles and lines to measure the hole diameter and edge distance. The right pane shows the circle-to-edge measurement. The data strip shows the OK/NG verdicts.
+
+![MV Studio template positioning and dimensional measurement project](assets/studio-template-positioning-measurement.png)
+
+**Structured-light reconstruction.** The workflow decodes 25 projected patterns to reconstruct the surface of a machined part. The right pane shows a false-color depth map alongside a rotatable point cloud.
+
+![MV Studio structured-light reconstruction project with a depth map and point cloud](assets/studio-structured-light-reconstruction.png)
+
+## SDK examples
 
 The image processing, contour, and matching results shown below are computed by mvkit. Matching scenes are derived from the same source image using controlled rotation and brightness changes.
 
@@ -90,8 +102,6 @@ Windows supports VS2019/2022/2026. The script automatically prefers the newest s
 
 ```powershell
 ./scripts/setup-windows.ps1
-New-Item -ItemType Directory -Path build/demo-output -Force
-./build/bin/Release/mvkit_demo_image_processing.exe ./examples/images ./build/demo-output
 ```
 
 Ubuntu / WSL:
@@ -100,9 +110,9 @@ Ubuntu / WSL:
 bash scripts/setup-ubuntu.sh --system
 cmake --preset linux
 cmake --build --preset linux --parallel
-mkdir -p build/demo-output
-./build/bin/mvkit_demo_image_processing ./examples/images ./build/demo-output
 ```
+
+The [command-line examples](../examples/README.md) can be enabled with `MVKIT_BUILD_EXAMPLES=ON`.
 
 Install the SDK:
 
@@ -163,6 +173,7 @@ The following are the versions bundled with the repository or pinned for source 
 | libpng | 1.6.58; PNG source fallback | PNG Reference Library License and historical notices; [upstream license](https://github.com/pnggroup/libpng/blob/v1.6.58/LICENSE) |
 | LibTIFF | 4.7.2; TIFF source fallback | Upstream permissive license and per-file notices; [upstream license](https://gitlab.com/libtiff/libtiff/-/blob/v4.7.2/LICENSE.md) |
 | zlib | 1.3.2; source fallback for transitive codec dependencies | zlib License; [upstream license](https://github.com/madler/zlib/blob/v1.3.2/LICENSE) |
+| Qt | 5.15.2; MV Studio dynamically links Qt Core, Gui, and Widgets, and loads the Windows platform plugin | Copyright The Qt Company Ltd. and contributors; [LGPL v3.0](../apps/third-party/qtbase-5.15.2/LICENSE.LGPL3); [copyright notices and corresponding source](../apps/THIRD_PARTY.md#qt-5152) |
 
 When using libjpeg-turbo, retain the following notice:
 

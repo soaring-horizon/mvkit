@@ -106,9 +106,13 @@ if(facet){
  const double tl=at(-1,-1),tc=at(-1,0),tr=at(-1,1),ml=at(0,-1),mc=m,mr=at(0,1),bl=at(1,-1),bc=at(1,0),br=at(1,1);
  const double dx=(tr+mr+br-tl-ml-bl)/6.,dy=(bl+bc+br-tl-tc-tr)/6.;
  const double xx=(tr+mr+br+tl+ml+bl-2*(tc+mc+bc))/3.,yy=(bl+bc+br+tl+tc+tr-2*(ml+mc+mr))/3.,xy=(br+tl-bl-tr)/4.;
- const double disc=normal_length(xx-yy,2*xy),positive=(xx+yy+disc)*.5,negative=(xx+yy-disc)*.5;const double curvature=std::abs(positive)>std::abs(negative)?positive:negative;
+ // Canny maxima are measured along the image gradient. A dominant Hessian
+ // eigenvector of the magnitude may instead be tangential on a curved edge,
+ // creating secondary contours on its flanks. Restrict the facet quadratic
+ // to the actual gradient normal before solving its stationary point.
+ const double nx=gx[idx]/m,ny=gy[idx]/m;
+ const double curvature=nx*nx*xx+2*nx*ny*xy+ny*ny*yy;
  if(curvature>=-1e-12)continue;
- double nx=xy,ny=curvature-xx;if(normal_length(curvature-yy,xy)>normal_length(nx,ny)){nx=curvature-yy;ny=xy;}const double length=normal_length(nx,ny);if(length==0)continue;nx/=length;ny/=length;
  const double t=-(dx*nx+dy*ny)/curvature,dr=t*ny,dc=t*nx;
  if(std::abs(dr)>.5+1e-6||std::abs(dc)>.5+1e-6)continue;
  locations.push_back({double(r)+dr,double(c)+dc,m,positive_atan2(-gy[idx],gx[idx])});cand[idx]=Candidate::from_location(locations.size()-1,m>=high);
@@ -119,6 +123,7 @@ if(facet){
 std::pmr::vector<std::uint8_t> hysteresis(std::span<const Candidate>cand,std::size_t w,std::size_t h,std::pmr::memory_resource* resource){std::pmr::vector<std::uint8_t>keep(cand.size(),0,resource);std::pmr::deque<std::size_t>q(resource);for(std::size_t i=0;i<cand.size();++i)if(cand[i].valid()&&cand[i].strong()){keep[i]=1;q.push_back(i);}while(!q.empty()){const auto idx=q.front();q.pop_front();const auto r=idx/w,c=idx%w;for(int dr=-1;dr<=1;++dr)for(int dc=-1;dc<=1;++dc){if(dr==0&&dc==0)continue;const auto rr=static_cast<std::int64_t>(r)+dr,cc=static_cast<std::int64_t>(c)+dc;if(rr<0||cc<0||rr>=static_cast<std::int64_t>(h)||cc>=static_cast<std::int64_t>(w))continue;const auto ni=static_cast<std::size_t>(rr)*w+static_cast<std::size_t>(cc);if(cand[ni].valid()&&!keep[ni]){keep[ni]=1;q.push_back(ni);}}}return keep;}
 struct NeighborList {
   std::array<std::size_t, 8> values{};
+  std::array<std::uint8_t, 8> directions{};
   std::size_t count{};
   [[nodiscard]] bool empty() const noexcept { return count == 0; }
   [[nodiscard]] std::size_t size() const noexcept { return count; }
@@ -130,16 +135,37 @@ struct NeighborList {
     return values.data() + count;
   }
 };
+constexpr std::array<int,8> neighbor_rows{-1,-1,-1,0,0,1,1,1};
+constexpr std::array<int,8> neighbor_cols{-1,0,1,-1,1,-1,0,1};
 
 NeighborList neighbors(std::size_t idx,
                        std::span<const std::uint8_t> active,
-                       std::size_t w, std::size_t h) {
+                       std::size_t w, std::size_t h,
+                       std::span<const std::uint8_t> adjacency = {}) {
+  NeighborList result;
+  if(!adjacency.empty()) {
+    // The immutable mask already contains only in-bounds neighbors. Walking
+    // its set bits preserves raster order without redoing coordinate division
+    // and boundary checks every time a vertex is consumed.
+    auto mask=unsigned(adjacency[idx]);
+    while(mask) {
+      const auto direction=std::countr_zero(mask);mask&=mask-1;
+      const auto neighbor=std::size_t(std::ptrdiff_t(idx)+
+          neighbor_rows[direction]*std::ptrdiff_t(w)+neighbor_cols[direction]);
+      if(active[neighbor]) {
+        result.directions[result.count]=std::uint8_t(direction);
+        result.values[result.count++]=neighbor;
+      }
+    }
+    return result;
+  }
   const auto r = idx / w;
   const auto c = idx % w;
-  NeighborList result;
+  unsigned direction=0;
   for (int dr = -1; dr <= 1; ++dr) {
     for (int dc = -1; dc <= 1; ++dc) {
       if (dr == 0 && dc == 0) continue;
+      const auto slot=direction++;
       const auto rr = static_cast<std::int64_t>(r) + dr;
       const auto cc = static_cast<std::int64_t>(c) + dc;
       if (rr < 0 || cc < 0 || rr >= static_cast<std::int64_t>(h) ||
@@ -147,7 +173,10 @@ NeighborList neighbors(std::size_t idx,
         continue;
       const auto neighbor = static_cast<std::size_t>(rr) * w +
                             static_cast<std::size_t>(cc);
-      if (active[neighbor]) result.values[result.count++] = neighbor;
+      if (active[neighbor]) {
+        result.directions[result.count]=std::uint8_t(slot);
+        result.values[result.count++] = neighbor;
+      }
     }
   }
   return result;
@@ -159,6 +188,32 @@ XldContours link_contours(std::span<const Candidate> cand,
                           std::pmr::memory_resource* resource) {
   std::vector<mv::core::IconicValue> out;
   std::pmr::vector<std::uint8_t> unused(keep.begin(), keep.end(), resource);
+  // Remove the longest edge of each strict geometric triangle before walking
+  // the graph. Use the original graph throughout: deleted vertices must not
+  // make a previously removed shortcut reappear during traversal.
+  std::pmr::vector<std::uint8_t> adjacency(keep.size(),0,resource);
+  const auto squared_distance=[&](std::size_t a,std::size_t b){
+    const auto& p=locations[cand[a].location()];const auto& q=locations[cand[b].location()];
+    const auto dr=p.row-q.row,dc=p.col-q.col;return dr*dr+dc*dc;
+  };
+  for(std::size_t i=0;i<keep.size();++i)if(keep[i]) {
+    const auto near=neighbors(i,keep,w,h);
+    std::array<double,8> distances{};
+    for(std::size_t a=0;a<near.size();++a)distances[a]=squared_distance(i,near.values[a]);
+    for(std::size_t a=0;a<near.size();++a) {
+      const auto j=near.values[a],direction=std::size_t(near.directions[a]);
+      bool shortcut=false;const double distance=distances[a];
+      for(std::size_t b=0;b<near.size();++b) {
+        if(!(distances[b]<distance))continue;
+        const auto other=near.directions[b];
+        const auto dr=std::abs(neighbor_rows[other]-neighbor_rows[direction]);
+        const auto dc=std::abs(neighbor_cols[other]-neighbor_cols[direction]);
+        if(dr<=1 && dc<=1 && squared_distance(j,near.values[b])<distance){shortcut=true;break;}
+      }
+      if(shortcut)continue;
+      adjacency[i]|=std::uint8_t(1u<<direction);
+    }
+  }
   std::pmr::vector<std::uint8_t> degree(unused.size(), 0, resource);
   std::pmr::deque<std::size_t> endpoints(resource);
   std::size_t remaining = 0;
@@ -166,11 +221,16 @@ XldContours link_contours(std::span<const Candidate> cand,
   for (std::size_t index = 0; index < unused.size(); ++index) {
     if (!unused[index]) continue;
     ++remaining;
-    degree[index] = static_cast<std::uint8_t>(
-        neighbors(index, unused, w, h).size());
+    degree[index] = static_cast<std::uint8_t>(std::popcount(adjacency[index]));
     if (degree[index] <= 1) endpoints.push_back(index);
   }
 
+  // ScratchArena is monotonic: per-contour vectors would retain every old
+  // allocation until the operator returns. Reuse the largest path workspace;
+  // from_points_and_attributes copies its spans into persistent storage.
+  std::pmr::vector<std::size_t> path(resource);
+  std::pmr::vector<Point2d> points(resource);
+  std::pmr::vector<double> response(resource),edge_direction(resource),normal_angle(resource);
   while (remaining > 0) {
     std::size_t start = unused.size();
     while (!endpoints.empty()) {
@@ -193,12 +253,12 @@ XldContours link_contours(std::span<const Candidate> cand,
     }
     if (start == unused.size()) break;
 
-    std::pmr::vector<std::size_t> path(resource);
+    path.clear();
     std::size_t current = start;
     std::size_t previous = unused.size();
     while (current < unused.size() && unused[current]) {
       path.push_back(current);
-      const auto active_neighbors = neighbors(current, unused, w, h);
+      const auto active_neighbors = neighbors(current, unused, w, h, adjacency);
       unused[current] = 0;
       degree[current] = 0;
       --remaining;
@@ -228,29 +288,27 @@ XldContours link_contours(std::span<const Candidate> cand,
     }
     if (path.size() < 2) continue;
 
-    std::pmr::vector<Point2d> points(resource);
-    std::pmr::vector<double> response(resource);
-    std::pmr::vector<double> edge_direction(resource);
-    std::pmr::vector<double> normal_angle(path.size(), resource);
-    points.reserve(path.size());
-    response.reserve(path.size());
-    edge_direction.reserve(path.size());
+    points.clear();response.clear();edge_direction.clear();
+    normal_angle.resize(path.size());
     for (const auto index : path) {
       points.push_back({locations[cand[index].location()].row, locations[cand[index].location()].col});
       response.push_back(locations[cand[index].location()].response);
       edge_direction.push_back(locations[cand[index].location()].edge_direction);
     }
+    const auto closing_neighbors=neighbors(path.back(),keep,w,h,adjacency);
+    const bool closed=path.size()>2 &&
+        std::find(closing_neighbors.begin(),closing_neighbors.end(),path.front())!=closing_neighbors.end();
     for (std::size_t index = 0; index < points.size(); ++index) {
-      const auto& before = points[index == 0 ? index : index - 1];
-      const auto& after = points[index + 1 < points.size() ? index + 1 : index];
+      const auto& before = points[index == 0 ? (closed ? points.size() - 1 : 0) : index - 1];
+      const auto& after = points[index + 1 < points.size() ? index + 1 : (closed ? 0 : index)];
       normal_angle[index] = positive_atan2(-(after.row - before.row), after.col - before.col);
     }
-    const bool closed =
-        path.size() > 2 &&
-        std::max(std::llabs(static_cast<long long>(path.front() / w) -
-                            static_cast<long long>(path.back() / w)),
-                 std::llabs(static_cast<long long>(path.front() % w) -
-                            static_cast<long long>(path.back() % w))) <= 1;
+    if (closed) {
+      points.push_back(points.front());
+      response.push_back(response.front());
+      edge_direction.push_back(edge_direction.front());
+      normal_angle.push_back(normal_angle.front());
+    }
     out.push_back(mv::core::IconicValue::from_xld_contour(XldContour::from_points_and_attributes(
         points, closed, ContourApproximation::Unknown, response,
         edge_direction, normal_angle)));
@@ -275,10 +333,15 @@ mv::core::XldContours edges_sub_pix(const Image& image,EdgeFilter filter,double 
       sobel_gradient(src,image.width(),image.height(),gx,gy);
     } else {
       const double response_scale=std::sqrt(2*std::numbers::pi_v<double>)*alpha;
-      paired=mv::imageproc::advanced::gaussian_gradient_pair(image,alpha,response_scale,paired_x,paired_y);
+      // Facet localization reads a 3x3 magnitude neighborhood, including just
+      // outside the output ROI. Zero-filled derivative pixels there create
+      // artificial maxima along the ROI border. Filter the backing image and
+      // apply the original domain only when selecting output candidates.
+      const auto derivative_source=image.full_domain();
+      paired=mv::imageproc::advanced::gaussian_gradient_pair(derivative_source,alpha,response_scale,paired_x,paired_y);
       if(!paired) {
-        gx=image_to_double(mv::imageproc::derivate_gauss(image,alpha,1,0),resource,response_scale);
-        gy=image_to_double(mv::imageproc::derivate_gauss(image,alpha,0,1),resource,response_scale);
+        gx=image_to_double(mv::imageproc::derivate_gauss(derivative_source,alpha,1,0),resource,response_scale);
+        gy=image_to_double(mv::imageproc::derivate_gauss(derivative_source,alpha,0,1),resource,response_scale);
       }
     }
   } else sobel_gradient(src,image.width(),image.height(),gx,gy);
@@ -296,7 +359,10 @@ mv::core::XldContours edges_sub_pix(const Image& image,EdgeFilter filter,double 
       if(r<0||c<0||r>=std::int64_t(height)||c>=std::int64_t(width))continue;
       const auto j=std::size_t(r)*width+std::size_t(c);if(!cand[j].valid())continue;
       const auto& a=locations[cand[i].location()];const auto& b=locations[cand[j].location()];
-      if(std::hypot(a.row-b.row,a.col-b.col)>=.5)continue;
+      const auto row_distance=std::abs(a.row-b.row),col_distance=std::abs(a.col-b.col);
+      // Most adjacent samples are consecutive contour points, not duplicates.
+      // An axis distance already at the radius cannot pass the Euclidean test.
+      if(row_distance>=.5||col_distance>=.5||std::hypot(row_distance,col_distance)>=.5)continue;
       if(a.response>=b.response)cand[j]={};else{cand[i]={};break;}
     }
   }

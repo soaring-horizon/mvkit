@@ -1106,6 +1106,7 @@ bool observation_from_homography(const std::vector<Vec2>& descr_xy, const std::v
   out.rows.reserve(descr_xy.size());
   out.columns.reserve(descr_xy.size());
   out.indices.reserve(descr_xy.size());
+  std::size_t visible = 0;
   (void)descr;
   for (std::size_t i = 0; i < descr_xy.size(); ++i) {
     double col = 0.0;
@@ -1115,6 +1116,7 @@ bool observation_from_homography(const std::vector<Vec2>& descr_xy, const std::v
         row > height - 0.5 - margin) {
       continue;
     }
+    ++visible;
     const std::size_t b = nearest_index(blobs, row, col, max_dist, used, search);
     if (b >= blobs.size()) continue;
     if (blobs[b].clipped) continue;
@@ -1123,7 +1125,10 @@ bool observation_from_homography(const std::vector<Vec2>& descr_xy, const std::v
     out.columns.push_back(blobs[b].col);
     out.indices.push_back(static_cast<std::int64_t>(i));
   }
-  return out.indices.size() >= need;
+  // Standard hex plates can extend beyond the image. Require coverage of the
+  // visible projected lattice, rather than half of the entire physical plate.
+  // Finder-pattern identity and its orientation margin are checked separately.
+  return out.indices.size() >= std::min(need, min_required_marks(visible));
 }
 
 void hex_neighbor_rc(int row, int col, int dir, int& nr, int& nc) {
@@ -1322,11 +1327,6 @@ bool detect_with_hole_finders(const std::vector<Blob>& blobs, const std::vector<
     double h[8]{};
     if (!fit_homography(descr_xy, blobs, d_ids, b_ids, h)) return;
 
-    const double pattern = finder_pattern_score(descr_xy, blobs, descr, h, s_img, 5, &search);
-    double h180[8]{};
-    homography_rotate_180(h, h180);
-    const double pattern_180 = finder_pattern_score(descr_xy, blobs, descr, h180, s_img, 5, &search);
-
     const double margin = 0.0;
     CalplateObservation cand_out;
     double h_copy[8];
@@ -1347,8 +1347,6 @@ bool detect_with_hole_finders(const std::vector<Blob>& blobs, const std::vector<
       best_obs = std::move(cand_out);
       have = true;
     }
-    (void)pattern;
-    (void)pattern_180;
   };
 
   for (const auto& cand : centers) {
@@ -1432,6 +1430,10 @@ bool detect_with_hole_finders(const std::vector<Blob>& blobs, const std::vector<
         if (ring_d.size() < 4) continue;
         double h_local[8]{};
         if (!fit_homography(descr_xy, blobs, ring_d, ring_b, h_local)) continue;
+        // One visible finder and its six neighbors already determine a local
+        // projective seed. Other finder centers may lie outside the image.
+        // Refine and validate the visible lattice and hole pattern before use.
+        consider(ring_d, ring_b, 0.0);
 
         std::vector<std::size_t> d_ids{finder_ids[0]};
         std::vector<std::size_t> b_ids{c0};
@@ -1450,6 +1452,26 @@ bool detect_with_hole_finders(const std::vector<Blob>& blobs, const std::vector<
           b_ids.push_back(b);
         }
         consider(d_ids, b_ids, err);
+      }
+    }
+    // A six-hole central finder with a dense, directionally unique lattice
+    // already fixes the board identity. Verify visible coverage before ending
+    // the center search; weak or sparse candidates retain the exhaustive path.
+    if (cand.hole_n >= 5 && have && best_obs.indices.size() >= std::min<std::size_t>(need,35) &&
+        best_pattern > best_pattern_180 + 40.0) {
+      std::vector<Blob> matched; std::vector<std::size_t> ids, indices;
+      for(std::size_t k=0;k<best_obs.indices.size();++k) {
+        Blob b; b.row=best_obs.rows[k];b.col=best_obs.columns[k];matched.push_back(b);
+        ids.push_back(std::size_t(best_obs.indices[k]));indices.push_back(k);
+      }
+      double h[8]{};
+      if(fit_homography(descr_xy,matched,ids,indices,h)) {
+        std::size_t visible=0;
+        for(const auto& p:descr_xy){double col=0,row=0;project_h(h,p.x,p.y,col,row);
+          if(col>=0&&row>=0&&col<width&&row<height)++visible;}
+        if(visible>=std::min<std::size_t>(need,35) && best_obs.indices.size()>=.9*double(visible)) {
+          break;
+        }
       }
     }
   }

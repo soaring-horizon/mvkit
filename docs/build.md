@@ -2,7 +2,7 @@
 
 ## 依赖与工具
 
-构建库需要 C++20；公开 C/C++ 接口分别面向 C11/C++14。Linux 使用 CMake 3.20+ 和 Ninja；Windows 支持 VS2019/2022/2026，VS2026 需要 CMake 4.2+。默认构建 Release、x64（Windows），开启图片 demo。公开版本没有测试与基准构建选项。
+构建库需要 C++20。公开 C/C++ 接口分别面向 C11/C++14。Linux 使用 CMake 3.20+ 和 Ninja。Windows 支持 VS2019/2022/2026，VS2026 需要 CMake 4.2+。默认构建 Release SDK，Windows 默认架构为 x64。图片示例可按需启用。
 
 私有数值实现使用随仓库提供的 Eigen 3.4.0。JPEG/PNG/TIFF/zlib 优先通过 `find_package` 查找系统开发库；缺失项再使用 `3rdparty/` 中的源码或固定哈希归档，最后从固定上游地址下载。版本与 SHA-256 以 [Dependencies.cmake](../cmake/Dependencies.cmake) 为准，不使用 vcpkg。
 
@@ -21,6 +21,17 @@ cmake --build --preset windows --parallel
 
 VS2022/2019 分别使用 `windows-2022` / `windows-2019` 配置与构建预设。示例位于 `build/bin/Release/`。切换编译器或生成器时使用新的构建目录。
 
+## Windows 版 MV Studio
+
+Studio 使用 Qt 5.15.2 x64。安装 Qt 的 `msvc2019_64` SDK 后使用下列预设。VS2026 可使用它随附的 CMake。
+
+```powershell
+cmake --preset windows-studio "-DCMAKE_PREFIX_PATH=C:/Qt/5.15.2/msvc2019_64"
+cmake --build --preset windows-studio-package --parallel 4
+```
+
+独立运行包位于 `build/studio/package/Release/MVStudio`，入口为 `mv_studio.exe`。VS2022 或 VS2019 分别使用 `windows-2022-studio` 或 `windows-2019-studio`，打包预设在相应名称后加 `-package`。SDK 安装与 Studio 运行包分别构建。
+
 ## Ubuntu 与 WSL
 
 ```sh
@@ -35,7 +46,7 @@ cmake --build --preset linux --parallel
 
 | 选项 | 用途 |
 |---|---|
-| `MVKIT_BUILD_EXAMPLES=OFF` | 仅构建库 |
+| `MVKIT_BUILD_EXAMPLES=ON` | 构建命令行图片示例 |
 | `MVKIT_USE_SYSTEM_LIBS=OFF` | 使用固定源码依赖 |
 | `MVKIT_OFFLINE=ON` | 禁止下载；必须已备齐系统库、源码或归档 |
 | `MVKIT_USE_EIGEN=OFF` | 使用内置数值后端 |

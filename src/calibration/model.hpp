@@ -110,6 +110,10 @@ struct CalibrationResult {
   std::vector<double> camera_covariance;
   bool covariance_available{false};
   std::string quality_message;
+  // Camera coordinate frames in reference camera 0. Private solver state.
+  std::vector<Pose3d> camera_poses;
+  std::vector<std::vector<double>> device_stddev, device_covariance;
+  std::vector<bool> device_covariance_available;
 };
 
 class CalibrationDataModel {
@@ -190,6 +194,7 @@ void set_observation_points(CalibrationDataModel& data, std::int64_t camera_inde
 
 // 模型优化入口与数据模型契约集中维护。
 void calibrate_cameras(CalibrationDataModel& data, double* reprojection_rmse);
+void calibrate_two_cameras(CalibrationDataModel& data, double* reprojection_rmse);
 void calibrate_hand_eye(CalibrationDataModel& data, std::string_view method,
                         std::array<double, 4>* errors);
 

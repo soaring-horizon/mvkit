@@ -2981,8 +2981,25 @@ std::vector<MatchCandidate> coarse_to_fine(const Image& image, GradientPyramid& 
   auto& unit_gp = pyramid.unit_gradients;
   const std::size_t top = levels.coarsest;
   const double div = model.levels()[top].pyramid_scale;
-  const double astep = model.angle_step() * std::max(1.0, div);
-  const double sstep = model.scale_step() * std::max(1.0, div);
+  double astep = model.angle_step() * std::max(1.0, div);
+  if(model.is_xld_model() && aextent>0) {
+    // Bound the arc displacement of half an angular cell by one coarse pixel.
+    // A large requested step otherwise loses partial CAD models before their
+    // pose can reach the geometric refinement. Treat it as an upper bound.
+    const double limit=2.0/std::max(1.0,model.levels()[top].radius*smax);
+    if(astep>limit)astep=aextent/std::ceil(aextent/limit);
+  }
+  // Half a coarse scale cell must move the most distant model point by at
+  // most one level pixel. A large user step otherwise shifts the best coarse
+  // translation beyond the refinement neighborhood before the true scale is
+  // ever tested. Subdivide the requested interval uniformly so its endpoints
+  // and each successive half-cell share the same refinement lattice.
+  const double scale_span = smax - smin;
+  const double requested_sstep = std::min(model.scale_step() * std::max(1.0, div),
+      2.0 / std::max(1.0, model.levels()[top].radius));
+  const double sstep = scaled && scale_span > 0
+      ? scale_span / std::ceil(scale_span / std::max(requested_sstep, 1e-6))
+      : std::max(requested_sstep, 1e-6);
   auto angles = select_angle_phase(samples(astart, aextent, astep), phase);
   if (angles.empty()) return {};
   auto scales = scaled ? samples(smin, smax - smin, std::max(sstep, 1e-6))
@@ -3573,6 +3590,10 @@ std::vector<MatchCandidate> coarse_to_fine(const Image& image, GradientPyramid& 
     cand.resize(candidate_limit);
   }
   std::sort(cand.begin(), cand.end(), better);
+  if (diagnostics)
+    for (const auto& x : std::span<const MatchCandidate>{cand}.first(std::min<std::size_t>(cand.size(), 8)))
+      std::fprintf(stderr, "mvkit_shape_parent level=%zu row=%.9g column=%.9g angle=%.9g scale=%.9g score=%.9g\n",
+          top, x.row, x.column, x.angle, x.scale, x.score);
   const auto refine_begin = diagnostics ? std::chrono::steady_clock::now()
                                         : std::chrono::steady_clock::time_point{};
   for (std::size_t l = top; l > levels.finest; --l) {
@@ -3603,7 +3624,10 @@ std::vector<MatchCandidate> coarse_to_fine(const Image& image, GradientPyramid& 
     }
     const auto generate_begin = diagnostics ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point{};
     if (diagnostics) diagnostics->refine_prepare_us += elapsed_us(prepare_begin, generate_begin);
-    const double step = model.levels()[l].pyramid_scale;
+    // A parent lattice cell is subdivided on the finer level. Reusing the
+    // parent spacing skips the intermediate position/angle/scale phases;
+    // e.g. .9 and 1.1 can never reach 1.0 with a .2 scale increment.
+    const double step = model.levels()[finer].pyramid_scale;
     // 角度/尺度晶格键仍在生成集合中，有序 trial 缓冲仅需空间键。
     struct RefinementTrial {
       MatchCandidate candidate;
@@ -3656,8 +3680,8 @@ std::vector<MatchCandidate> coarse_to_fine(const Image& image, GradientPyramid& 
       const auto slot=trial_slot(key);if(trial_key_used[slot])return false;
       trial_key_used[slot]=1;trial_keys[slot]=key;return true;
     };
-    const double angle_quantum = model.angle_step() * step;
-    const double scale_quantum = model.scale_step() * step;
+    const double angle_quantum = astep * step / div;
+    const double scale_quantum = sstep * step / div;
     for (const auto& base : cand) {
       std::array<double,3> rows, columns, angles, scales;
       std::array<std::int64_t,3> row_keys, column_keys, angle_keys, scale_keys, pixel_rows, pixel_columns;

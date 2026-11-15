@@ -95,6 +95,10 @@ void calibrate_cameras(CalibrationDataModel& data, double* reprojection_rmse) {
                           "data is not a camera-calibration setup");
   }
 
+  if (data.num_cameras() == 2) {
+    calibrate_two_cameras(data, reprojection_rmse);
+    return;
+  }
   if (data.num_cameras() != 1) {
     throw core::Exception(core::Status::Unsupported, "calibrate_cameras", "joint multi-camera solving is not implemented");
   }
@@ -203,7 +207,9 @@ void calibrate_cameras(CalibrationDataModel& data, double* reprojection_rmse) {
   solver::SolverSummary summary;
   const auto status = backend->solve(problem, data.options(), &summary);
   if (status != core::Status::Ok) {
-    throw core::Exception(status, "calibrate_cameras", summary.message);
+    throw core::Exception(status, "calibrate_cameras", summary.message +
+        " (cost " + std::to_string(summary.initial_cost) + " -> " +
+        std::to_string(summary.final_cost) + ")");
   }
 
   CameraParameters final_parameters = start;

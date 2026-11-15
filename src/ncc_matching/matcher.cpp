@@ -328,7 +328,7 @@ struct PreparedQuery {
   std::unordered_map<const Patch*,ScorePlane> raster_scores;
   std::pmr::unordered_map<FitKey,Match,FitHash> fitted{context.scratch_resource()};
   bool memoize_refinement=false;
-  bool default_background_guard=false;
+  bool experimental_background_guard=false;
   bool exact_byte_statistics=false;
   QueryCache* cache=nullptr;
   std::size_t refine_calls=0,fit_calls=0,fit_hits=0,raster_hits=0,derivative_calls=0,proposal_calls=0,proposal_rejected=0;
@@ -834,9 +834,10 @@ static std::unique_ptr<PreparedQuery> prepare(const core::Image& image,const Mod
   fine.storage_width=source.storage_width;fine.storage_height=source.storage_height;
   if(!source.shared_values){fine.values.reset_for_overwrite(source.values.size());
   if(source.values.size())std::memcpy(fine.values.data(),source.values.data(),source.values.size()*sizeof(double));}
-  // 这是经验验证的稠密搜索策略，不是相关上界。密度与缓存独立；
-  // 别名模型即使候选少也可启用缓存，不支持的搜索保留六步。
-  prepared->default_background_guard=!finest && cache && cache->cache_derivatives && cache->unlimited_selection &&
+  // The score after an LM iteration is not an upper bound on later scores.
+  // Keep the historical early-stop policy available only for explicit trials;
+  // normal searches retain all six refinement iterations and exact caching.
+  prepared->experimental_background_guard=!finest && cache && cache->cache_derivatives && cache->unlimited_selection &&
       candidates.size()>=32 && prepared->exact_byte_statistics && vectorize && options.subpixel &&
       !image.has_reduced_domain() &&
       !options.num_matches && options.min_score>=.75 && options.min_score<=.85 &&
@@ -919,11 +920,9 @@ static bool refine_candidate(PreparedQuery& query,Match& candidate) {
       else if(!std::strcmp(setting,"staged")){first_background_guard=.3;background_guard=.2;}
       else if(!std::strcmp(setting,"staged01")){first_background_guard=.3;background_guard=.1;}
       else if(!std::strcmp(setting,"staged21")){first_background_guard=.2;background_guard=.1;}
-      else if(!std::strcmp(setting,"staged11") && query.default_background_guard) {
+      else if(!std::strcmp(setting,"staged11") && query.experimental_background_guard) {
         first_background_guard=options.min_score>=.8 ? .1 : .2;background_guard=.1;
       }
-    }else if(!guard_setting && query.default_background_guard) {
-      first_background_guard=options.min_score>=.8 ? .1 : .2;background_guard=.1;
     }
     bool cached=false;double next_delta[3]{};
     RefinementMemo memo;memo.crop_row=crop_row;memo.crop_column=crop_column;

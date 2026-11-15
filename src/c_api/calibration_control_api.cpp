@@ -413,6 +413,23 @@ extern "C" ::MvStatus mv_get_calib_data(::MvTuple CalibDataID, ::MvTuple ItemTyp
           names.fail(ErrorCode::InvalidValue, i, "optimization_method is a hand-eye setting");
         if (kind == "camera" && attribute == "params" && !model.calibration_result())
           names.fail(ErrorCode::InvalidObjectState, i, "calibrated camera parameters are not available");
+        if (kind == "model" && attribute == "camera_setup_model") {
+          if(slot.size()!=1 || slot.at(0).kind()!=mv::core::ValueKind::String || text(slot)!="general")
+            slot.fail(ErrorCode::InvalidValue,-1,"model item index must be 'general'");
+          if (!model.calibration_result())
+            names.fail(ErrorCode::InvalidObjectState,i,"camera calibration result is not available");
+          auto setup=mv::reconstruction::CameraSetupModel::create(static_cast<std::int64_t>(model.num_cameras()));
+          for(std::size_t camera=0;camera<model.num_cameras();++camera) {
+            const auto& poses=model.calibration_result()->camera_poses;
+            setup.set_camera(camera,*model.camera(camera).parameters,
+                mv::calibration::pose_to_halcon_tuple(poses.empty()?mv::Pose3d{}:poses.at(camera)));
+          }
+          auto handle=std::make_unique<MvCameraSetupModelImpl>();
+          handle->value=std::make_unique<mv::reconstruction::CameraSetupModel>(std::move(setup));
+          output[0].append(mv::core::Handle::make<mv::c_api::CameraSetupModelObject>(handle.get()));
+          mv::c_api::release_opaque(handle.release());
+          continue;
+        }
         auto values = mv::calibration::get_calib_data(model, kind, indices, attribute);
         if(names.size()==1)output[0]=std::move(values);
         else for (std::size_t j = 0; j < values.size(); ++j) output[0].append(values.at(j));
@@ -622,7 +639,9 @@ extern "C" ::MvStatus mv_project_3d_point(::MvTuple X, ::MvTuple Y, ::MvTuple Z,
         using T=std::decay_t<decltype(p)>;
         constexpr bool perspective=std::is_same_v<T,mv::calibration::AreaScanDivisionParameters> ||
                                     std::is_same_v<T,mv::calibration::AreaScanPolynomialParameters>;
-        const double factor=[&]{if constexpr(perspective)return p.focus;else return p.magnification;}();
+        double factor;
+        if constexpr(perspective)factor=p.focus;
+        else factor=p.magnification;
         const auto scale=_mm_set1_pd(factor),sx=_mm_set1_pd(p.sx),sy=_mm_set1_pd(p.sy);
         const auto cx=_mm_set1_pd(p.cx),cy=_mm_set1_pd(p.cy);
         for(;x.size()-i>=2;i+=2) {

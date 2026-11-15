@@ -1,0 +1,46 @@
+{
+  "repository": "lucide-icons/lucide",
+  "commit": "a630cec77eac6568b989e87e4947a8bfe45caacd",
+  "license": "ISC; full upstream LICENSE retained including Feather notice",
+  "icons": {
+    "view-2d": "image",
+    "undo": "undo-2",
+    "redo": "redo-2",
+    "layout": "panels-top-left"
+  },
+  "rendering": {
+    "viewBox": 24,
+    "targetSize": 20,
+    "strokeWidth": 1.5,
+    "cap": "round",
+    "join": "round",
+    "fill": "none"
+  },
+  "files": [
+    {
+      "file": "image.svg",
+      "url": "https://raw.githubusercontent.com/lucide-icons/lucide/a630cec77eac6568b989e87e4947a8bfe45caacd/icons/image.svg",
+      "sha256": "619c9db58c879dce6250376ba67d9c9102ca6dbb3b1efb9294c9f180e22273a5"
+    },
+    {
+      "file": "undo-2.svg",
+      "url": "https://raw.githubusercontent.com/lucide-icons/lucide/a630cec77eac6568b989e87e4947a8bfe45caacd/icons/undo-2.svg",
+      "sha256": "efad2edbbd2be6038cc23fd64df2d012fad5cc6460dfbf227cfa3d990e9e897f"
+    },
+    {
+      "file": "redo-2.svg",
+      "url": "https://raw.githubusercontent.com/lucide-icons/lucide/a630cec77eac6568b989e87e4947a8bfe45caacd/icons/redo-2.svg",
+      "sha256": "4cbd2cdebc70b6b7979c681ed3f313d9cbb102465dcf7d0d2d6a72c937b344bc"
+    },
+    {
+      "file": "panels-top-left.svg",
+      "url": "https://raw.githubusercontent.com/lucide-icons/lucide/a630cec77eac6568b989e87e4947a8bfe45caacd/icons/panels-top-left.svg",
+      "sha256": "321a2a5500f2b814a2e62eb73c4b01dc65c7334fe2e6f7d77517239383e26bb1"
+    },
+    {
+      "file": "LICENSE",
+      "url": "https://raw.githubusercontent.com/lucide-icons/lucide/a630cec77eac6568b989e87e4947a8bfe45caacd/LICENSE",
+      "sha256": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57"
+    }
+  ]
+}

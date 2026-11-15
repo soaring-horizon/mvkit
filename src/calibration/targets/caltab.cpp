@@ -1,5 +1,6 @@
 #include <calibration/targets/caltab.hpp>
 #include <calibration/targets/find_calib_object.hpp>
+#include <calibration/calibration/homography.hpp>
 
 #include <algorithm>
 #include <array>
@@ -275,6 +276,57 @@ std::vector<core::Point2d> detect_caltab(const core::Image& image,
   const std::size_t description_corner_col = description_triangle % columns;
 
   std::vector<core::Point2d> result(image_order.size());
+  if (rows == columns) {
+    // A corner marker identifies a rotation of a square grid, not a mirror.
+    // Independent row/column flips would change handedness at quarter turns
+    // and give the two cameras incompatible board coordinate systems.
+    const auto clockwise = [&](std::size_t row, std::size_t col) {
+      return row == 0 ? (col == 0 ? 0 : 1) : (col == 0 ? 3 : 2);
+    };
+    int rotation = (clockwise(image_corner_row,image_corner_col) -
+        clockwise(description_corner_row,description_corner_col) + 4) % 4;
+    if (description.triangle) {
+      // Sample the actual descriptor's triangular patch through a projective
+      // map. A fixed image-space offset can land on the enclosing frame at
+      // tilted corners and falsely identify a different board orientation.
+      const auto& t=*description.triangle;
+      const auto& mark=description.points[description_triangle];
+      const double tx=.5*(t[0]+t[2]),ty=.5*(t[1]+t[3]);
+      const double ox=tx<mark.x?std::min(t[0],t[2]):std::max(t[0],t[2]);
+      const double oy=ty<mark.y?std::min(t[1],t[3]):std::max(t[1],t[3]);
+      const auto* pixels=static_cast<const std::uint8_t*>(image.data());
+      double best=std::numeric_limits<double>::infinity();
+      for(int turn=0;turn<4;++turn) {
+        std::vector<double> x,y,u,v;
+        for(const auto index:image_corners) {
+          std::size_t ir=index/columns,ic=index%columns;
+          for(int k=0;k<turn;++k){const auto next=ic;ic=columns-1-ir;ir=next;}
+          x.push_back(description.points[index].x);y.push_back(description.points[index].y);
+          u.push_back(image_order[ir*columns+ic].col);v.push_back(image_order[ir*columns+ic].row);
+        }
+        const auto h=fit_planar_homography_2d(x,y,u,v);
+        double sum=0.;int samples=0;
+        for(double a:{.25,.30,.35})for(double b:{.25,.30,.35}) {
+          const double px=(1-a-b)*ox+a*t[0]+b*t[2],py=(1-a-b)*oy+a*t[1]+b*t[3];
+          const double w=h[6]*px+h[7]*py+h[8];
+          const double col=(h[0]*px+h[1]*py+h[2])/w,row=(h[3]*px+h[4]*py+h[5])/w;
+          if(!(col>=0&&row>=0&&col<double(image.width()-1)&&row<double(image.height()-1)))continue;
+          const auto r=std::size_t(row),c=std::size_t(col);
+          const double dy=row-r,dx=col-c;
+          const auto at=[&](std::size_t rr,std::size_t cc){return double(pixels[rr*image.stride()+cc]);};
+          sum+=(1-dy)*((1-dx)*at(r,c)+dx*at(r,c+1))+dy*((1-dx)*at(r+1,c)+dx*at(r+1,c+1));++samples;
+        }
+        const double score=samples==9?sum/samples:std::numeric_limits<double>::infinity();
+        if(score<best){best=score;rotation=turn;}
+      }
+    }
+    for (std::size_t r=0;r<rows;++r) for(std::size_t c=0;c<columns;++c) {
+      std::size_t ir=r,ic=c;
+      for(int turn=0;turn<rotation;++turn) {const auto next=ic;ic=columns-1-ir;ir=next;}
+      result[r*columns+c]=image_order[ir*columns+ic];
+    }
+    return result;
+  }
   for (std::size_t r = 0; r < rows; ++r) {
     const auto row_offset = r > description_corner_row ? r - description_corner_row
                                                         : description_corner_row - r;

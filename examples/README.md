@@ -15,12 +15,12 @@
 
 ## 编译
 
-在项目根目录运行，示例默认开启；仅构建库时可设置 `MVKIT_BUILD_EXAMPLES=OFF`。工具与依赖准备见[构建说明](../docs/build.md)。
+在项目根目录配置时设置 `MVKIT_BUILD_EXAMPLES=ON` 以构建图片示例。工具与依赖准备见[构建说明](../docs/build.md)。
 
 Windows：
 
 ```powershell
-./scripts/setup-windows.ps1
+cmake --preset windows -DMVKIT_BUILD_EXAMPLES=ON
 # 修改示例后可单独重新构建目标。
 cmake --build --preset windows --target mvkit_demo_xld_edges --parallel
 ```
@@ -29,7 +29,7 @@ Ubuntu / WSL：
 
 ```sh
 bash scripts/setup-ubuntu.sh --system
-cmake --preset linux
+cmake --preset linux -DMVKIT_BUILD_EXAMPLES=ON
 cmake --build --preset linux --parallel
 ```
 
